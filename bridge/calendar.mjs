@@ -1,6 +1,8 @@
 import { createSdkMcpServer, tool } from '@anthropic-ai/claude-agent-sdk'
 import { execFile } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
+import { existsSync } from 'node:fs'
+import { icloudCalendar, icloudConfigured } from './calendar-icloud.mjs'
 import { z } from 'zod'
 
 /**
@@ -23,7 +25,33 @@ import { z } from 'zod'
 
 const HELPER = fileURLToPath(new URL('./calendar-helper/jarvis-calendar', import.meta.url))
 
+/**
+ * Which calendar to talk to. On a Mac with the helper built, the system
+ * calendar (EventKit). Anywhere else — or when CALENDAR_BACKEND=icloud — iCloud
+ * over CalDAV, which needs ICLOUD_USER and ICLOUD_APP_PASSWORD.
+ */
+export function calendarBackend() {
+  const want = (process.env.CALENDAR_BACKEND ?? '').toLowerCase()
+  if (want !== 'icloud' && process.platform === 'darwin' && existsSync(HELPER)) return 'macos'
+  if (icloudConfigured()) return 'icloud'
+  return null
+}
+
 function helper(request) {
+  const backend = calendarBackend()
+  if (backend === 'icloud') return icloudCalendar(request)
+  if (backend === null) {
+    return Promise.resolve({
+      error:
+        process.platform === 'darwin'
+          ? 'Calendar helper not built. Run npm run build:calendar.'
+          : 'No calendar configured. Set ICLOUD_USER and ICLOUD_APP_PASSWORD in .env.',
+    })
+  }
+  return eventKit(request)
+}
+
+function eventKit(request) {
   return new Promise((resolve) => {
     execFile(HELPER, [JSON.stringify(request)], { timeout: 20_000 }, (err, stdout) => {
       if (err && !stdout) {

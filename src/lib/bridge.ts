@@ -55,6 +55,7 @@ const SERVER_NAMES: Record<string, string> = {
   jarvis_chrome: 'navegador',
   jarvis_eyes: 'cámara',
   jarvis_calendar: 'calendario',
+  casa: 'casa',
 }
 function friendlyServer(name: string): string {
   if (name in SERVER_NAMES) return SERVER_NAMES[name]

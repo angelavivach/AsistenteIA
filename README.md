@@ -18,9 +18,13 @@ Basado en [J.A.R.V.I.S.](https://github.com/adewaskar/jarvis) de adewaskar
 - **Voz de ElevenLabs.** Usa la voz *George* (multilingüe) y la transcripción
   *Scribe* en español. Sin clave de ElevenLabs, usa la voz y el reconocimiento
   del navegador.
-- **Gestiona tu calendario.** Lee y modifica el Calendario de macOS (iCloud,
-  Google o Exchange, si están añadidos en el Mac). **Antes de crear, mover,
-  renombrar o borrar un evento te lo lee y espera tu «sí».**
+- **Gestiona tu calendario.** En Mac usa el Calendario de macOS (iCloud, Google
+  o Exchange); en Windows se conecta directamente a **iCloud**. **Antes de
+  crear, mover, renombrar o borrar un evento te lo lee y espera tu «sí».**
+- **Controla tu casa** con **Home Assistant**: luces, enchufes, escenas… por voz
+  («enciende la luz del salón») o desde el **home pad** (botón **CASA** o tecla
+  **C**), con los aparatos agrupados por habitación. Cerraduras, alarmas y
+  similares siempre piden confirmación.
 - **Responde hablando, no escribiendo.** Solo abre paneles en pantalla cuando le
   pides ver algo (una imagen, un vídeo, una página).
 - **Sabe la fecha y la hora**, así que entiende «mañana», «el jueves» o «dentro
@@ -39,7 +43,10 @@ Basado en [J.A.R.V.I.S.](https://github.com/adewaskar/jarvis) de adewaskar
 
 ## Requisitos
 
-- **macOS** (el calendario usa EventKit, que solo existe en Mac).
+> **¿Windows?** Sigue la guía [docs/INSTALAR-WINDOWS.md](docs/INSTALAR-WINDOWS.md)
+> (Odín + calendario de iCloud + Home Assistant en un PC con Windows 11).
+
+- **macOS**. En Mac el calendario usa EventKit; en Windows se usa iCloud.
 - **Node.js 20 o superior** (`brew install node`).
 - **Claude Code** instalado y con la sesión iniciada. Es el cerebro y usa tu
   suscripción de Claude, sin API key.
@@ -76,7 +83,9 @@ echo 'export ELEVENLABS_API_KEY=sk_tu_clave' >> ~/.zshrc
 
 ## Arrancar
 
-Haz **doble clic en `Odin.command`**. Se abre Terminal, se comprueba el acceso
+En Windows: doble clic en **`Odin.bat`**.
+
+En Mac: haz **doble clic en `Odin.command`**. Se abre Terminal, se comprueba el acceso
 al calendario y arranca Odín.
 
 La primera vez, macOS pedirá permiso para que **Terminal** acceda a tus
@@ -110,6 +119,7 @@ micrófono y di **«Oye Odín»**.
 | **D** | Panel de diagnóstico (qué oye, qué descarta) |
 | **T** | Prueba de audio |
 | **V** | Cambia la voz del navegador (solo sin ElevenLabs) |
+| **C** | Abre o cierra el home pad (Casa) |
 
 ---
 
@@ -146,7 +156,11 @@ Son dos procesos que se hablan por WebSocket en `localhost:8787`:
 
 ## Configuración
 
-Variables de entorno del puente (opcionales):
+Las claves van en un archivo **`.env`** junto a `package.json`. Copia
+`odin.env.example` como `.env` y rellénalo. Ese archivo no se sube a GitHub. En
+Mac también sirven las variables de `~/.zshrc`.
+
+Variables (todas opcionales):
 
 | Variable | Por defecto | Para qué |
 |---|---|---|
@@ -156,6 +170,10 @@ Variables de entorno del puente (opcionales):
 | `JARVIS_EFFORT` | `high` | Nivel de razonamiento |
 | `JARVIS_ALLOW_WRITES` | desactivado | `1` permite acciones con efecto fuera del calendario |
 | `JARVIS_BRIDGE_PORT` | `8787` | Puerto del puente |
+| `ICLOUD_USER` / `ICLOUD_APP_PASSWORD` | — | Calendario de iCloud (contraseña de app) |
+| `ICLOUD_DEFAULT_CALENDAR` | el primero | Calendario para eventos nuevos |
+| `CALENDAR_BACKEND` | auto | `icloud` para usar iCloud también en Mac |
+| `HA_URL` / `HA_TOKEN` | — | Home Assistant (dirección y token de larga duración) |
 
 Las variables conservan el prefijo `JARVIS_` del proyecto original.
 
@@ -184,11 +202,9 @@ Las variables conservan el prefijo `JARVIS_` del proyecto original.
 
 ## Próximos pasos (en estudio)
 
-- Usarlo desde el **iPhone** (HTTPS en la red local, o por Tailscale).
+- Usarlo desde el **iPhone** o una tablet como home pad, por **Tailscale**.
 - Convertirlo en **aplicación de Mac** con icono propio.
 - **Cerebro local** con Ollama, gratis y privado, como alternativa a Claude.
-- Montar Odín en un **Acer Nitro** como servidor en casa, con el calendario de
-  iCloud conectado directamente.
 
 ---
 

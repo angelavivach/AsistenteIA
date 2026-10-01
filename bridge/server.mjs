@@ -22,12 +22,24 @@ import { uiServer } from './ui.mjs'
 import { chromeAvailable, chromeServer } from './chrome.mjs'
 import { visionServer } from './vision.mjs'
 import { calendarServer } from './calendar.mjs'
+import { handleHome, homeConfigured } from './home.mjs'
 import { homedir, tmpdir } from 'node:os'
 import { readFileSync, realpathSync } from 'node:fs'
 import { readFile, realpath, stat } from 'node:fs/promises'
 import { isAbsolute, join, relative, resolve as resolvePath } from 'node:path'
 import { openRemote, proxyError, vetTarget, PROXY_UA } from './net.mjs'
 import { probeUrl, renderPage } from './page.mjs'
+// Settings from a .env file next to package.json — how keys reach the bridge on
+// Windows, where there is no ~/.zshrc. Real environment variables still win.
+import { existsSync as envFileExists } from 'node:fs'
+if (envFileExists(new URL('../.env', import.meta.url))) {
+  try {
+    process.loadEnvFile(new URL('../.env', import.meta.url))
+  } catch (err) {
+    console.warn(`[odin] could not read .env: ${err.message}`)
+  }
+}
+
 
 const PORT = Number(process.env.JARVIS_BRIDGE_PORT ?? 8787)
 
@@ -168,9 +180,29 @@ function configuredServers() {
       ...(cfg.mcpServers ?? {}),
       // Servers scoped to the home directory apply too, since that's our cwd.
       ...(cfg.projects?.[homedir()]?.mcpServers ?? {}),
+      ...homeAssistantServer(),
     }
   } catch {
-    return {}
+    return homeAssistantServer()
+  }
+}
+
+/**
+ * Home Assistant, through its own MCP server integration ("Model Context
+ * Protocol Server" in Settings → Devices & services). It exposes exactly the
+ * entities you have shared with Assist, as tools like HassTurnOn / HassLightSet.
+ * Configured with HA_URL and a long-lived access token in HA_TOKEN.
+ */
+function homeAssistantServer() {
+  const url = process.env.HA_URL
+  const token = process.env.HA_TOKEN
+  if (!url || !token) return {}
+  return {
+    casa: {
+      type: 'http',
+      url: `${url.replace(/\/+$/, '')}/api/mcp`,
+      headers: { Authorization: `Bearer ${token}` },
+    },
   }
 }
 
@@ -284,6 +316,11 @@ function decideTool(name) {
     // to a spoken read-back, so the gate lives in the tools, not here.
     if (server === 'jarvis_calendar') return true
 
+    // Home Assistant only exposes what you chose to share with Assist, and
+    // turning a light on is the whole point. The risky ones — locks, alarms,
+    // garage doors — are held back by the persona's confirmation rule.
+    if (server === 'casa') return true
+
     const tool = mcpToolOf(name)
     if (EFFECTFUL_VERB.test(tool) && !VETO_EXEMPT.has(`${server}__${tool}`)) {
       return ALLOW_WRITES
@@ -377,6 +414,14 @@ CALENDAR. You can read and change the user's Calendar with the calendar_* tools.
 Every change — create, move, rename or delete — is read back first in one short
 sentence and done only after the user says yes. A yes covers exactly the change
 you read back, nothing more.
+
+HOME. With the casa tools you control the user's home through Home Assistant:
+lights, plugs, scenes, climate and so on. Lights, plugs, scenes and media act
+at once and are confirmed by result ("Luces del salón apagadas."). Anything
+that affects safety or locks people in or out — locks, alarms, garage doors,
+gates, boilers, and turning off every device at once — is read back first and
+done only after the user says yes. If a device is not among the tools, say it
+is not available; never guess an entity.
 
 The blades — the ONLY surface:
 - Everything you show goes on a blade. There is nowhere else. \`blade\` opens
@@ -686,6 +731,7 @@ function corsFor(req) {
   if (origin) {
     headers['access-control-allow-origin'] = origin
     headers['access-control-allow-headers'] = 'content-type'
+    headers['access-control-allow-methods'] = 'GET, POST, OPTIONS'
   }
   return headers
 }
@@ -707,6 +753,9 @@ const handleRequest = async (req, res) => {
     return res.end()
   }
 
+  // The home pad: device list and buttons, relayed to Home Assistant.
+  if (await handleHome(req, res, cors)) return
+
   if (req.method === 'GET' && req.url === '/health') {
     // The browser reads this once at boot to decide which voice engine to use.
     // Both premium paths ride the same ElevenLabs key, so both flags track it:
@@ -715,7 +764,7 @@ const handleRequest = async (req, res) => {
     // student with nothing configured still has a working assistant.
     const eleven = Boolean(elevenKey())
     res.writeHead(200, { ...cors, 'content-type': 'application/json' })
-    return res.end(JSON.stringify({ ok: true, tts: eleven, stt: eleven }))
+    return res.end(JSON.stringify({ ok: true, tts: eleven, stt: eleven, home: homeConfigured() }))
   }
 
   // Serve local image files to the page. Screenshots and generated art land on
