@@ -1,321 +1,200 @@
-# ODIN
+# ODÍN
 
-Asistente de voz personal en español, basado en [J.A.R.V.I.S.](https://github.com/adewaskar/jarvis) de adewaskar (MIT). Di **«Oye Odín»**; arráncalo con doble clic en `Odin.command`.
+Asistente de voz personal en español, con interfaz en el navegador y el cerebro
+de Claude. Dices **«Oye Odín»**, te escucha, te contesta en voz alta y puede
+consultar y cambiar tu calendario.
 
----
-
-## Proyecto original (J.A.R.V.I.S.)
-
-A browser voice assistant with an Iron Man holographic interface. Say
-**"Hey Jarvis"**, he wakes, listens, and does real things through your tools —
-searches the web, generates images, drives your phone, reads your mail. The face
-is a web page (React + Vite + Three.js + custom GLSL). The brain is Claude Code,
-run headless as a library.
-
-**The only subscription you need is Claude Code.** No API keys, no OpenAI
-account, no cloud bill — the brain runs on your existing Claude Code login, and
-the heavy work (the model itself) runs on Anthropic's servers, so even a low-end
-laptop only has to draw the interface. **ElevenLabs is an optional add-on** that
-gives JARVIS a much better voice and sharper hearing; without it he speaks and
-listens through the browser's own speech, and everything still works.
+Basado en [J.A.R.V.I.S.](https://github.com/adewaskar/jarvis) de adewaskar
+(licencia MIT), adaptado al español y rediseñado.
 
 ---
 
-## Requirements
+## Qué hace
 
-**In one line:** a Claude Code subscription, plus two free things every computer
-can have — Node.js and Chrome. That's the whole list.
-
-- **Claude Code, installed and logged in** — this is the only account you need.
-  Install it with the official method — `npm install -g @anthropic-ai/claude-code`,
-  or the platform installer at <https://docs.claude.com/en/docs/claude-code> —
-  then run `claude` once and complete login. The bridge reuses that login. **No
-  API key**, and usage is billed to your existing Claude account.
-- **Node.js 20 or newer** — free, one installer from <https://nodejs.org>. This
-  is a Node web app, so it is the one unavoidable tool.
-- **Google Chrome or Microsoft Edge**, in a **real browser window** — not an
-  embedded preview pane. Preview panes (including the one inside editors and
-  Claude Code) block microphone access, so the page loads and looks right but
-  never hears you. JARVIS also needs WebGL, which these browsers provide.
-- **Optional: an ElevenLabs API key** — a good add-on, not a requirement. It
-  gives a better voice and sharper transcription; the free tier is plenty for a
-  demo. Without it, everything runs on the browser's own speech.
-
-Run `npm run setup` after cloning and it checks all of this for you, in plain
-language.
+- **Habla y entiende español.** Responde siempre en español de España, de usted,
+  y te llama **Angela**. Frases breves, pensadas para oírse.
+- **Se activa por voz.** «Oye Odín», «Hola Odín» o solo «Odín». También con la
+  tecla **Espacio**.
+- **Voz de ElevenLabs.** Usa la voz *George* (multilingüe) y la transcripción
+  *Scribe* en español. Sin clave de ElevenLabs, usa la voz y el reconocimiento
+  del navegador.
+- **Gestiona tu calendario.** Lee y modifica el Calendario de macOS (iCloud,
+  Google o Exchange, si están añadidos en el Mac). **Antes de crear, mover,
+  renombrar o borrar un evento te lo lee y espera tu «sí».**
+- **Responde hablando, no escribiendo.** Solo abre paneles en pantalla cuando le
+  pides ver algo (una imagen, un vídeo, una página).
+- **Sabe la fecha y la hora**, así que entiende «mañana», «el jueves» o «dentro
+  de una hora».
+- **Interfaz propia:**
+  - **Pantalla de inicio:** ondas de puntos violeta, rosa y naranja, el título
+    «ODÍN» cromado e iridiscente con estelas de humo, e «INICIAR».
+  - **Arranque minimalista** inspirado en *Blade Runner 2049*: neblina, línea de
+    horizonte, el nombre apareciendo letra a letra y un sol que sube.
+  - **Interfaz principal:** una esfera de puntos que se pliega como una tela
+    (rosa arriba, violeta, azul abajo). Reacciona a la voz, y su color cambia
+    según esté escuchando, pensando o hablando.
+  - **Sonido de arranque propio**, generado con ElevenLabs.
 
 ---
 
-## Quick start
+## Requisitos
 
-First, install, then start it:
+- **macOS** (el calendario usa EventKit, que solo existe en Mac).
+- **Node.js 20 o superior** (`brew install node`).
+- **Claude Code** instalado y con la sesión iniciada. Es el cerebro y usa tu
+  suscripción de Claude, sin API key.
+  ```bash
+  npm install -g @anthropic-ai/claude-code
+  claude   # inicia sesión una vez y sal con /exit
+  ```
+- **Google Chrome**, en una ventana normal. Los paneles de vista previa de los
+  editores bloquean el micrófono.
+- **Xcode Command Line Tools**, para compilar el ayudante de calendario
+  (`xcode-select --install`).
+- **Opcional, pero recomendado:** una clave de API de **ElevenLabs**
+  (elevenlabs.io → Developers → API Keys). El plan gratuito sirve.
+
+---
+
+## Instalación
 
 ```bash
+git clone https://github.com/angelavivach/AsistenteIA.git
+cd AsistenteIA
 npm install
-npm start          # runs the brain and the face together
+npm run build:calendar
 ```
 
-Then open the URL it prints (http://localhost:5173) in **Chrome**, click **INITIALISE**, and say **“Hey Jarvis”**.
-
-Prefer two terminals? Run them separately instead:
+Guarda la clave de ElevenLabs en tu configuración de terminal. Es la clave que
+empieza por `sk_`, no el ID de una voz:
 
 ```bash
-npm install
+echo 'export ELEVENLABS_API_KEY=sk_tu_clave' >> ~/.zshrc
 ```
-
-Terminal 1 — the brain:
-
-```bash
-npm run bridge
-```
-
-Terminal 2 — the face:
-
-```bash
-npm run dev
-```
-
-Then open the app in a **real Chrome or Edge window**:
-
-```bash
-open http://localhost:5173
-```
-
-Click **INITIALISE**, allow the microphone when asked, and say **"Hey Jarvis"**.
-
-> It has to be a real browser window. Embedded preview panes block the
-> microphone, so JARVIS will look perfectly alive and simply never respond.
 
 ---
 
-## How it works
+## Arrancar
 
-JARVIS is two processes. The browser is the face and the voice; the bridge is
-the brain and the hands.
+Haz **doble clic en `Odin.command`**. Se abre Terminal, se comprueba el acceso
+al calendario y arranca Odín.
 
-```
-  ┌─ browser (the face) ───────────────┐        ┌─ bridge (the brain) ─────────────┐
-  │  "Hey Jarvis" wake word            │        │  Node · bridge/server.mjs        │
-  │  local VAD  →  speech to text      │   ws   │  Claude Agent SDK                │
-  │  reactor UI (Three.js + GLSL)      │◄─────► │   = Claude Code, headless        │
-  │  text to speech                    │  8787  │  spawns your MCP servers         │
-  │  heads-up display                  │        │  permission gate (decideTool)    │
-  └────────────────────────────────────┘        └──────────────────────────────────┘
-```
+La primera vez, macOS pedirá permiso para que **Terminal** acceda a tus
+calendarios: pulsa **Permitir**. Si no aparece, actívalo en Ajustes del Sistema
+→ Privacidad y seguridad → **Calendarios** → Terminal.
 
-Everything you see and hear happens in the browser. The bridge is a single Node
-process (`bridge/server.mjs`) that runs the **Claude Agent SDK**
-(`@anthropic-ai/claude-agent-sdk`) — this spawns the real `claude` CLI as a child
-process, so **the brain literally is Claude Code, headless.** They talk over a
-WebSocket (plus a few HTTP endpoints) on `ws://localhost:8787`.
+Después abre **http://localhost:5173** en Chrome, pulsa **INICIAR**, permite el
+micrófono y di **«Oye Odín»**.
 
-**Why a bridge at all?** A browser tab cannot spawn the local stdio MCP servers —
-`higgsfield`, `elevenlabs`, `android`, `playwright`, `exa`, `serper`, and the
-rest. The bridge can. And because it is the Agent SDK, it authenticates off your
-existing Claude Code login: no API key, billed to that same Claude account.
-
-**The model.** `claude-opus-5` at effort `medium` by default. Override with the
-`JARVIS_MODEL` and `JARVIS_EFFORT` environment variables. On startup the bridge
-prints its choice, e.g. `[jarvis] model claude-opus-5 · effort medium`.
-
-### The voice pipeline
-
-The loop is designed so that nothing silently dies and barge-in feels natural.
-
-- **Detection is local.** An energy-based voice-activity detector
-  (`src/lib/vad.ts`) decides when you are speaking. It is instant, cannot quietly
-  fail, and is what makes **barge-in** work — speak while JARVIS is talking and he
-  stops.
-- **Transcription has two tiers, chosen automatically at boot.** The browser asks
-  the bridge `/health` and picks the best available:
-  - **ElevenLabs key present** → ElevenLabs Scribe, via the bridge `/stt` endpoint.
-  - **Nothing configured** → the browser's own `SpeechRecognition` (Chrome/Edge),
-    guarded by a heartbeat so it recovers when Chrome throttles it.
-- **Speaking** uses the **ElevenLabs voice when a key is present**, and the
-  browser's `speechSynthesis` otherwise. If a cloud call fails it falls back to
-  the browser voice, and if the OS voice itself is broken it latches over to the
-  cloud voice.
-
-So it works with no keys and auto-upgrades when a key appears — there is no flag
-to set. Capability detection lives in `src/lib/capabilities.ts`, which probes the
-bridge's `GET /health` (returning `{ ok, tts, stt }`, both tracking the
-ElevenLabs key) once at boot and picks the engines.
+> Arráncalo siempre desde `Odin.command` (o desde Terminal con `npm start`): el
+> permiso del calendario lo tiene Terminal, no el navegador.
 
 ---
 
-## What JARVIS can do
+## Qué puedes decirle
 
-Beyond answering, JARVIS reaches every MCP server in your Claude Code
-configuration, and can drive his own interface.
+- «Oye Odín, ¿qué tengo mañana?»
+- «Crea una cita con el dentista el lunes a las cinco.»
+- «Mueve el teletrabajo del viernes a las nueve.»
+- «¿Cuál es mi próxima reunión?»
+- «¿Qué tiempo va a hacer?»
 
-### Your tools
+## Controles
 
-Every server in your `~/.claude.json` is handed to the SDK explicitly. Depending
-on what you have installed, that is roughly:
-
-- **Web & search** — `exa`, `serper`, `serpapi`
-- **Images & video** — `higgsfield`, `openrouter-image`, `palmier-pro`
-- **Voice** — `elevenlabs`
-- **Your phone** — `android`
-- **The browser** — `playwright`
-
-A few things you can say:
-
-- *"What's happening in AI this week?"*
-- *"Generate an image of the Mark VII suit."*
-- *"Take a screenshot of my phone."*
-- *"Open my GitHub notifications."*
-
-> **Note on account connectors.** Servers you added through your **claude.ai
-> account** are not stored on disk, so the bridge cannot see them — it works from
-> the servers in `~/.claude.json` (about 14), not the claude.ai ones.
-
-### JARVIS controls the interface
-
-He drives the UI through MCP tools the bridge exposes:
-
-- `ui_theme` — accent, background, per-phase colours
-- `ui_reactor` — colour, scale, intensity, spin, and style (`ring` | `sphere` | `wire`), visibility
-- `ui_orbit` — put images in orbit around the reactor
-- `ui_chrome` — show or hide rails, transcript, badges
-- `ui_effect` — `glitch` | `pulse` | `scan` | `shake` | `flash`
-- `ui_screen` — clear
-- `ui_reset` — back to defaults
-
-So *"make it red, hide the systems list, put that render in orbit"* is a spoken
-command.
-
-### The heads-up display
-
-JARVIS authors panels with a `display` tool against a fixed `.hud-*` design
-system. The browser sanitises the markup (DOMPurify, a class allowlist and a
-strict CSP) before rendering. Rich media works — images, `<video>`, and
-YouTube/Vimeo embeds. Remote images and video are fetched **server-side** through
-the bridge (`/img` and `/media`, both SSRF-guarded), so hotlink-blocked news
-thumbnails still appear and the page never beacons your IP to a host the model
-chose.
-
----
-
-## Controls
-
-| Key / phrase | Does |
+| Tecla / frase | Hace |
 |---|---|
-| **"Hey Jarvis"** | Wake him |
-| **Space** | Talk without the wake word |
-| Just speak | Interrupt him mid-sentence (barge-in) |
-| **V** | Cycle the browser voice |
-| **Escape** | Stand down |
-| **D** | Live diagnostics panel |
-| **T** | One-line audio self-test |
+| **«Oye Odín»** | Lo despierta |
+| **Espacio** | Hablar sin decir su nombre |
+| Hablar mientras habla | Lo interrumpe |
+| **Escape** | Lo manda a esperar |
+| **D** | Panel de diagnóstico (qué oye, qué descarta) |
+| **T** | Prueba de audio |
+| **V** | Cambia la voz del navegador (solo sin ElevenLabs) |
 
 ---
 
-## The boot sequence
+## Cómo funciona
 
-Power-up plays a four-beat Iron Man start-up (`src/ui/Boot.tsx`): an
-"INITIATING SYSTEM" status bar with a segmented progress bar and boot log; then
-concentric reticle rings resolving into "J.A.R.V.I.S"; then a suit schematic;
-then the triangular arc reactor lighting up — with a start-up sound under it
-(`public/audio/boot-music.mp3`).
+Son dos procesos que se hablan por WebSocket en `localhost:8787`:
+
+```
+┌─ Navegador (la cara) ──────────────┐        ┌─ Puente (el cerebro) ────────────────┐
+│  «Oye Odín» + detector de voz      │        │  Node · bridge/server.mjs            │
+│  voz a texto (ElevenLabs Scribe)   │   ws   │  Claude Agent SDK = Claude Code      │
+│  esfera de puntos (Three.js)       │◄─────► │  herramientas: calendario, interfaz  │
+│  texto a voz (ElevenLabs)          │  8787  │  permisos: solo lectura salvo        │
+│  pantalla de inicio y arranque     │        │  el calendario (con confirmación)    │
+└────────────────────────────────────┘        └──────────────────────────────────────┘
+                                                         │
+                                       bridge/calendar-helper (Swift + EventKit)
+                                                         │
+                                                 Calendario de macOS
+```
+
+- **El cerebro** es Claude Code ejecutado sin ventana (modelo `claude-opus-5`,
+  esfuerzo `high`), con una personalidad propia en español definida en
+  `bridge/server.mjs`.
+- **El calendario** lo maneja un pequeño programa en Swift
+  (`bridge/calendar-helper/`) que usa EventKit. Es mucho más rápido que
+  AppleScript y entiende los eventos que se repiten. Si cambias un evento
+  repetido, solo cambia ese día.
+- **Permisos:** todo es de solo lectura (correo, archivos, navegador…) salvo el
+  calendario. Las herramientas de calendario se niegan a actuar si no has
+  confirmado el cambio por voz.
 
 ---
 
-## Configuration
+## Configuración
 
-Everything is optional in bridge mode. Frontend settings live in `.env.local`
-(copy `.env.example`); bridge settings are environment variables.
+Variables de entorno del puente (opcionales):
 
-### Bridge
-
-| Variable | Default | Effect |
+| Variable | Por defecto | Para qué |
 |---|---|---|
-| `JARVIS_BRIDGE_PORT` | `8787` | Port for the WebSocket + HTTP endpoints |
-| `JARVIS_MODEL` | `claude-opus-5` | Model to run |
-| `JARVIS_EFFORT` | `medium` | Reasoning effort |
-| `JARVIS_ALLOW_WRITES` | off | `1` allows effectful tools (see below) |
-| `JARVIS_ALLOWED_ORIGINS` | local dev | Extra WebSocket origins to accept |
-| `JARVIS_ALLOW_NO_ORIGIN` | off | Accept connections with no `Origin` header |
-| `JARVIS_FILE_ROOTS` | — | Roots the `/file` endpoint may serve from |
-| `JARVIS_VOICE_ID` | — | ElevenLabs voice id |
-| `ELEVENLABS_API_KEY` | — | Optional; enables the ElevenLabs voice + Scribe |
+| `ELEVENLABS_API_KEY` | — | Activa la voz y la transcripción de ElevenLabs |
+| `JARVIS_VOICE_ID` | `JBFqnCBsd6RMkjVDRZzb` (George) | Voz de ElevenLabs |
+| `JARVIS_MODEL` | `claude-opus-5` | Modelo de Claude |
+| `JARVIS_EFFORT` | `high` | Nivel de razonamiento |
+| `JARVIS_ALLOW_WRITES` | desactivado | `1` permite acciones con efecto fuera del calendario |
+| `JARVIS_BRIDGE_PORT` | `8787` | Puerto del puente |
 
-### Frontend (`.env.local`)
+Las variables conservan el prefijo `JARVIS_` del proyecto original.
 
-| Variable | Effect |
-|---|---|
-| `VITE_BACKEND` | `bridge` (default) or `direct` |
-| `VITE_BRIDGE_URL` | Where to reach the bridge |
-| `VITE_TTS_ENGINE` | `system` or `kokoro` |
-| `VITE_KOKORO_VOICE` | Voice for the Kokoro engine |
-| `VITE_USE_ELEVENLABS` | Force the ElevenLabs voice on |
-| `VITE_ANTHROPIC_API_KEY` | Direct mode only |
-
-### Adding an ElevenLabs key
-
-You do not have to touch a flag. Either:
-
-- Set `ELEVENLABS_API_KEY` on the bridge before starting it, **or**
-- Add the key to your `elevenlabs` MCP server's env in `~/.claude.json` — the
-  bridge reads it from there too.
-
-Either way, `/health` starts reporting the capability, the browser picks it up on
-the next boot, and both the voice and transcription upgrade automatically.
+> **Voces de la biblioteca de ElevenLabs** (por ejemplo, narradores en español
+> como *Mariano Gómez*): con el plan gratuito no se pueden usar por API. Hace
+> falta el plan Starter o superior. Las voces incluidas (George, Daniel…) sí
+> funcionan gratis.
 
 ---
 
-## Enabling actions
+## Solución de problemas
 
-The tool gate starts **read-only**. Search, generation and lookups run freely;
-anything effectful — send, tap, delete, install, pay — is denied. Voice is a poor
-interface for a confirmation dialog, so the decision is made ahead of time in
-`decideTool()` in `bridge/server.mjs`, not at the moment of use. The bridge sets
-`settingSources: []`, which makes its own gate the only authority — filesystem
-settings and any global `bypassPermissions` cannot override it.
-
-To allow effectful tools (phone, browser driving, sending), run the bridge this
-way instead:
-
-```bash
-npm run bridge:writes
-```
-
-> Read `decideTool()` before you do. *"Hey Jarvis, clean up my downloads folder"*
-> means something rather different with writes enabled.
+- **No me oye o no le oigo:** usa Chrome en una ventana normal, permite el
+  micrófono y pulsa **D** para ver el diagnóstico.
+- **«Oye Odín» no lo despierta, pero con Espacio sí:** Terminal muestra cada
+  transcripción como `[odin] oído: "..."`. Si ElevenLabs escribe su nombre de otra
+  forma, añádela a `WAKE` en `src/lib/voice.ts` y a `NAME` en `src/App.tsx`.
+- **«Calendar access denied»:** dale permiso a Terminal en Privacidad y seguridad
+  → Calendarios, y arranca con `Odin.command`.
+- **No habla con la voz de ElevenLabs:** comprueba que `ELEVENLABS_API_KEY` es la
+  clave `sk_...` y no un ID de voz.
+- **El puente no responde:** comprueba que no hay otro programa usando el puerto
+  `8787`.
 
 ---
 
-## Troubleshooting
+## Próximos pasos (en estudio)
 
-**I can't hear him, or he can't hear me.** Press **D** for the diagnostics panel
-— it states plainly whether he is hearing you and whether he is producing sound.
-Press **T** for a one-line audio self-test.
-
-**No voice at all.** You must be in **Chrome or Edge**, in a **real browser
-window** (not an embedded preview), and you must have **allowed the microphone**.
-
-**Bridge not reachable.** Check that `npm run bridge` is still running in its
-terminal, and that nothing else is holding port `8787`.
+- Usarlo desde el **iPhone** (HTTPS en la red local, o por Tailscale).
+- Convertirlo en **aplicación de Mac** con icono propio.
+- **Cerebro local** con Ollama, gratis y privado, como alternativa a Claude.
+- Montar Odín en un **Acer Nitro** como servidor en casa, con el calendario de
+  iCloud conectado directamente.
 
 ---
 
-## Security
+## Créditos y licencia
 
-All of this lives in `bridge/server.mjs`:
-
-- The WebSocket accepts only local dev origins (add more with
-  `JARVIS_ALLOWED_ORIGINS`).
-- `/file`, `/img` and `/media` validate the scheme, confine to allowed roots,
-  resolve the real path, and refuse private and loopback addresses (SSRF guard).
-- The tool gate (`decideTool`) is default-deny for effectful MCP tools.
-- A strict CSP in `index.html`; model-authored panel HTML is sanitised.
-
----
-
-## Credits & licence
-
-MIT.
-
-The boot sound and any tracks in `public/audio/` ship with the project for the
-demo. If you go on to monetise something built on this, clearing the rights to
-that audio is your responsibility.
+- Proyecto original: [J.A.R.V.I.S.](https://github.com/adewaskar/jarvis) de
+  adewaskar, licencia MIT (ver `LICENSE`).
+- Música de fondo y de trabajo: Kevin MacLeod (CC BY 4.0). Sonido de arranque
+  generado con ElevenLabs. Detalles en `public/audio/CREDITS.md`.
