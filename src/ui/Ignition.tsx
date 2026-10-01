@@ -1,4 +1,5 @@
 import { useStore } from '../store'
+import { WaveField } from './WaveField'
 
 /**
  * The start gate.
@@ -38,17 +39,34 @@ export function Ignition({ onStart }: { onStart: () => void }) {
   if (phase !== 'offline') return null
 
   return (
-    <button className="ignition" onClick={onStart}>
-      {/*
-        Spun by CSS rather than framer. As a motion element with
-        `repeat: Infinity` it was one of the things keeping the exit from ever
-        finishing — AnimatePresence waits for a leaving subtree's animations,
-        and an infinite one never ends.
-      */}
-      <span className="ignition-ring" />
+    <button className="ignition" onClick={onStart} aria-label="Iniciar Odín">
+      <WaveField />
+
+      {/* The liquid wobble on the title and the smoke under it. */}
+      <svg className="ignition-defs" aria-hidden="true">
+        <filter id="odin-liquid" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.006 0.012" numOctaves="1" seed="3">
+            <animate attributeName="baseFrequency" dur="14s" repeatCount="indefinite"
+              values="0.006 0.012;0.009 0.016;0.006 0.012" />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" scale="3" />
+        </filter>
+        <filter id="odin-smoke" x="-30%" y="-10%" width="160%" height="260%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.045 0.007" numOctaves="3" seed="8">
+            <animate attributeName="seed" dur="9s" values="8;14;8" repeatCount="indefinite" />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" scale="80" />
+          <feGaussianBlur stdDeviation="6" />
+        </filter>
+      </svg>
+
       <span className="ignition-label">
-        <span className="ignition-word">INITIALISE</span>
-        <span className="ignition-sub">click, or clap, to power up</span>
+        <span className="ignition-title" data-text="ODÍN">
+          <span className="ignition-smoke" aria-hidden="true">ODÍN</span>
+          <span className="ignition-chrome">ODÍN</span>
+        </span>
+        <span className="ignition-word">INICIAR</span>
+        <span className="ignition-ring" />
       </span>
     </button>
   )

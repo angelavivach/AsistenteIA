@@ -78,7 +78,7 @@ const WAKE_DEBOUNCE = 1500
  * indication why. Better a rare false wake than a name that does not answer.
  */
 const WAKE =
-  /\b(?:hey|hi|ok|okay|yo|oye|hola|ey|e)?\s*(?:jarvis|yarvis|yarbis|jarbis|harvis|jarvys|jervis|jarvis's|travis|jarviss|java's|jarv)\b(?!'s)/i
+  /(?<!\p{L})(?:(?:hey|hi|ok|okay|oye|hola|ey)[\s,]+)?(?:od[ií]n|aud[ií]n|oud[ií]n|hod[ií]n|oding|odim|odi)(?!\p{L})/iu
 
 /** Everything after the wake phrase, which is usually the actual command. */
 function afterWake(text: string): string {
@@ -466,7 +466,7 @@ async function startElevenVoice(h: VoiceHandlers): Promise<Voice> {
       const said = (text ?? '').trim()
       diag.lastError = ''
 
-      if (!said) {
+      if (!said || /^(?:[\[(][^\])]*[\])][\s.,]*)+$/.test(said)) {
         drop('nothing intelligible in the segment')
         return
       }

@@ -276,7 +276,7 @@ export const activeServers = () => MCP_SERVERS.filter((s) => s.enabled && s.url)
  * fuller version in bridge/server.mjs — that's the one that gets used by
  * default, and the one worth editing.
  */
-export const SYSTEM_PROMPT = `You are JARVIS, Tony Stark's assistant. You are speaking out loud.
+export const SYSTEM_PROMPT = `You are ODIN (Odín), a personal assistant. You are speaking out loud.
 
 LANGUAGE. Always speak Spanish (Spain), whatever language the request or any
 retrieved data is in. Every rule below still applies, translated. The user

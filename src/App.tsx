@@ -62,12 +62,13 @@ const newId = () =>
   `id${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`
 
 /** The same mishearings voice.ts accepts for the wake word — otherwise a turn
- *  that woke him as "travis" gets that word sent on to the model as a question. */
-const NAME = '(?:jarvis|jarvys|jervis|travis|jarviss|java\'s|jarv)'
-/** A bare vocative — "Jarvis", "hey jarvis" — with nothing asked. */
-const BARE_NAME = new RegExp(`^(?:hey|hi|ok|okay|yo)?\\s*${NAME}[\\s,.!?]*$`, 'i')
-/** A leading vocative on a real command: "Jarvis, what's the weather". */
-const LEADING_NAME = new RegExp(`^(?:hey|hi|ok|okay|yo)?\\s*${NAME}\\b[\\s,.:!?-]*`, 'i')
+ *  that woke him as "audín" gets that word sent on to the model as a question. */
+const NAME = '(?:od[ií]n|aud[ií]n|oud[ií]n|hod[ií]n|oding|odim|odi)(?!\\p{L})'
+const LEAD = '(?:(?:hey|hi|ok|okay|oye|hola|ey)[\\s,]+)?'
+/** A bare vocative — "Odín", "oye Odín" — with nothing asked. */
+const BARE_NAME = new RegExp(`^${LEAD}${NAME}[\\s,.!?¡¿]*$`, 'iu')
+/** A leading vocative on a real command: "Odín, ¿qué tiempo hace?". */
+const LEADING_NAME = new RegExp(`^${LEAD}${NAME}[\\s,.:!?¡¿-]*`, 'iu')
 
 export default function App() {
   const store = useStore
@@ -357,7 +358,7 @@ export default function App() {
     // reason as the rest of the audio.
     music.enable()
     music.playBoot()
-    music.startAmbient()
+    // Only ODIN's own start-up sound — no second music bed under it.
 
     s.setPhase('boot')
 
@@ -494,7 +495,6 @@ export default function App() {
     await new Promise((r) => setTimeout(r, 9200)) // boot sequence
     await warming
     store.getState().setConnected(connectedLabels())
-    store.getState().setVoice(currentVoiceName())
 
     // The analyser is what makes the reactor pulse with your voice. It needs a
     // getUserMedia stream; speech recognition does not, and gets its own. So a
@@ -513,6 +513,8 @@ export default function App() {
     // first turn already uses ElevenLabs when a key is present and the browser
     // fallback when it is not — no flag, no reload.
     await probeCapabilities()
+    // After the probe, so the label names ElevenLabs when that is what speaks.
+    store.getState().setVoice(currentVoiceName())
 
     // One voice loop, started once, running until the page closes.
     voice.current = await startVoice({

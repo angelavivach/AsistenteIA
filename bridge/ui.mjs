@@ -273,7 +273,7 @@ const chromeSchema = {
   transcript: looseBool('The running conversation log.'),
   tool_badge: looseBool('The active-tool readout under the reactor.'),
   suggestions: looseBool('The "try saying…" hint.'),
-  brand: looseBool('The J.A.R.V.I.S. wordmark and status line.'),
+  brand: looseBool('The ODIN wordmark and status line.'),
 }
 
 const CHROME_DESCRIPTION = `Show or hide the furniture around the display.
@@ -339,7 +339,7 @@ export function uiServer(emit) {
     name: 'jarvis_ui',
     version: '1.0.0',
     instructions:
-      'JARVIS\'s control of his own interface — colour, reactor, orbiting ' +
+      'ODIN\'s control of his own interface — colour, reactor, orbiting ' +
       'images, chrome, effects. Change it when the change carries meaning, ' +
       'and put it back afterwards with ui_reset.',
     // Same reasoning as the display server: behind tool search it would never

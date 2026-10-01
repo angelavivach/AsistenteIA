@@ -1,4 +1,10 @@
-# J.A.R.V.I.S.
+# ODIN
+
+Asistente de voz personal en español, basado en [J.A.R.V.I.S.](https://github.com/adewaskar/jarvis) de adewaskar (MIT). Di **«Oye Odín»**; arráncalo con doble clic en `Odin.command`.
+
+---
+
+## Proyecto original (J.A.R.V.I.S.)
 
 A browser voice assistant with an Iron Man holographic interface. Say
 **"Hey Jarvis"**, he wakes, listens, and does real things through your tools —

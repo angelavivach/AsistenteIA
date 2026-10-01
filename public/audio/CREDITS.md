@@ -1,13 +1,13 @@
 # Audio credits
 
-All three tracks are by **Kevin MacLeod** (incompetech.com), licensed
+`ambient.mp3` and `work.mp3` are by **Kevin MacLeod** (incompetech.com), licensed
 **Creative Commons Attribution 4.0**. Free to use commercially — including in a
 monetised YouTube video — provided the attribution below appears somewhere the
 audience can see it (a description box is fine).
 
 | File | Track | Used for |
 |---|---|---|
-| `boot-music.mp3` | *Impact Prelude* | The swell when the reactor comes up |
+| `boot-music.mp3` | ODIN start-up sound, generated with ElevenLabs Sound Effects | The swell under the boot sequence |
 | `ambient.mp3` | *Ossuary 6 – Air* | Low bed looping under the interface |
 | `work.mp3` | *Mechanolith* | Rises while a tool is running |
 
@@ -15,7 +15,6 @@ audience can see it (a description box is fine).
 
 ```
 Music by Kevin MacLeod (incompetech.com)
-  "Impact Prelude"    — Licensed under Creative Commons: By Attribution 4.0
   "Ossuary 6 - Air"   — Licensed under Creative Commons: By Attribution 4.0
   "Mechanolith"       — Licensed under Creative Commons: By Attribution 4.0
 http://creativecommons.org/licenses/by/4.0/

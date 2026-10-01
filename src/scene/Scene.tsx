@@ -9,7 +9,7 @@ import {
 } from '@react-three/postprocessing'
 import { BlendFunction } from 'postprocessing'
 import * as THREE from 'three'
-import { Core } from './Core'
+import { Orb } from './Orb'
 import { Particles } from './Particles'
 import { Orbits } from './Orbits'
 import { useStore, phaseColor, accentFor, type Phase } from '../store'
@@ -185,7 +185,7 @@ function Rig() {
   // subject is one unbroken one.
   return (
     <>
-      <Core drive={drive} />
+      <Orb drive={drive} />
       <Particles drive={drive} />
       <Orbits />
     </>
@@ -219,10 +219,10 @@ export function Scene() {
       <EffectComposer multisampling={0}>
         {/* Bloom is what turns additive lines into "hologram". */}
         <Bloom
-          intensity={1.15}
+          intensity={0.9}
           // A higher threshold keeps the mid-tones intact so the orb doesn't
           // flatten into a solid white disc.
-          luminanceThreshold={0.22}
+          luminanceThreshold={0.3}
           luminanceSmoothing={0.85}
           mipmapBlur
           radius={0.72}

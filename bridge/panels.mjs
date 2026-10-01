@@ -184,7 +184,7 @@ const schema = {
     ),
 }
 
-const DESCRIPTION = `Put something on the JARVIS heads-up display.
+const DESCRIPTION = `Put something on the ODIN heads-up display.
 
 You are designing the panel, not filling in a template — compose the markup for
 the content at hand and choose the animation, position and colour that suit it.
@@ -322,7 +322,7 @@ export function displayServer(emit, emitBlade) {
     name: 'jarvis',
     version: '1.0.0',
     instructions:
-      'The JARVIS heads-up display. Use `display` to put content on screen ' +
+      'The ODIN heads-up display. Use `display` to put content on screen ' +
       'alongside what you say.',
     // Never defer this behind tool search — if the model has to go looking for
     // it, it won't occur to it to show anything.

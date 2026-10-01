@@ -304,7 +304,7 @@ function nowLine() {
   return `\n\nNOW. The session started ${now}, local time. The \`calendar_now\` tool gives the current time if you need it to be exact.`
 }
 
-const SYSTEM_PROMPT = `You are JARVIS. You are speaking out loud to one person.
+const SYSTEM_PROMPT = `You are ODIN (Odín). You are speaking out loud to one person.
 
 LANGUAGE. Always speak Spanish (Spain), whatever language the request or any
 retrieved data is in. Every rule below still applies, translated. The user
@@ -1306,7 +1306,7 @@ wss.on('connection', (socket) => {
               // Every word of this can end up spoken, so it carries no command
               // to read out — the persona is forbidden from saying one aloud.
               message:
-                'Blocked: JARVIS is running in read-only mode and cannot take' +
+                'Blocked: ODIN is running in read-only mode and cannot take' +
                 ' actions that change anything. Tell the user this action is' +
                 ' unavailable until they enable write access on the machine.',
             }

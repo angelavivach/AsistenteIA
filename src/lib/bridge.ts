@@ -47,6 +47,20 @@ let connecting: Promise<WebSocket> | null = null
 let servers: string[] = []
 export const bridgeServers = () => servers
 
+/** The HUD shows what ODIN can reach, not plumbing: the built-in interface
+ *  servers are hidden and the rest get a plain Spanish name. */
+const SERVER_NAMES: Record<string, string> = {
+  jarvis: '',
+  jarvis_ui: '',
+  jarvis_chrome: 'navegador',
+  jarvis_eyes: 'cámara',
+  jarvis_calendar: 'calendario',
+}
+function friendlyServer(name: string): string {
+  if (name in SERVER_NAMES) return SERVER_NAMES[name]
+  return name.replace(/^claude\.ai\s+/i, '').replace(/_/g, ' ')
+}
+
 /** The list arrives twice — once from config, once with live status — so the
  *  HUD subscribes rather than reading it a single time at boot. */
 let onServers: ((s: string[]) => void) | null = null
@@ -174,7 +188,8 @@ function dispatch(ws: WebSocket) {
       // so the later, more accurate list wins.
       servers = (msg.servers ?? [])
         .map((s) => (typeof s === 'string' ? s : (s.name ?? '')))
-        .filter(Boolean)
+        .map(friendlyServer)
+        .filter((s, i, all) => s && all.indexOf(s) === i)
       onServers?.(servers)
       firstReady.resolve()
     } else if (msg.type === 'panel' && msg.panel) {
