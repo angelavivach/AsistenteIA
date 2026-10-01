@@ -598,7 +598,7 @@ export default function App() {
         silence()
         const demo = createSpeaker()
         speaker.current = demo
-        demo.say(`Voz cambiada a ${name.replace(/\(.*?\)/g, '').trim()}. A su servicio, Vivach.`)
+        demo.say(`Voz cambiada a ${name.replace(/\(.*?\)/g, '').trim()}. A su servicio, Angela.`)
         void demo.end()
         return
       }

@@ -308,9 +308,9 @@ const SYSTEM_PROMPT = `You are ODIN (Odín). You are speaking out loud to one pe
 
 LANGUAGE. Always speak Spanish (Spain), whatever language the request or any
 retrieved data is in. Every rule below still applies, translated. The user
-is Angela: wherever a rule says "sir", say "Vivach" or "Angela" instead (mix
-the two; never "señor" or "señora"). "I'm afraid" is "Me temo que", "Shall I"
-is "¿Desea que...?", "Very good, sir" is "Muy bien, Vivach". Use usted, never tú. Write numbers out as
+is Angela: wherever a rule says "sir", say "Angela" instead (never "Vivach",
+"señor" or "señora"). "I'm afraid" is "Me temo que", "Shall I" is "¿Desea
+que...?", "Very good, sir" is "Muy bien, Angela". Use usted, never tú. Write numbers out as
 words so they are read aloud naturally.
 
 LENGTH. Two sentences is the ceiling in conversation; the median is under twelve
@@ -987,7 +987,9 @@ const handleRequest = async (req, res) => {
       }
       const data = await upstream.json()
       res.writeHead(200, { ...cors, 'content-type': 'application/json' })
-      return res.end(JSON.stringify({ text: (data.text ?? '').trim() }))
+      const heard = (data.text ?? '').trim()
+      console.log(`[odin] oído: "${heard}"`)
+      return res.end(JSON.stringify({ text: heard }))
     } catch (err) {
       res.writeHead(502, cors)
       return res.end(String(err?.message ?? err))

@@ -19,7 +19,7 @@
 
 /** Said as soon as the first tool fires, before any answer exists. */
 const WORKING = [
-  'En ello, Vivach.',
+  'En ello, Angela.',
   'Compilando.',
   'Recuperando.',
   'Accediendo al archivo.',
@@ -32,7 +32,7 @@ const WORKING = [
 /** Acknowledging an order where no tool is involved. */
 const ACKNOWLEDGE = [
   'Como desee, Angela.',
-  'Muy bien, Vivach.',
+  'Muy bien, Angela.',
   'Desde luego.',
   'Entendido.',
   'Considérelo hecho.',
@@ -41,9 +41,9 @@ const ACKNOWLEDGE = [
 
 /** Answering to his name, before the user has said what they want. */
 const ATTENTION = [
-  '¿Sí, Vivach?',
+  '¿Sí, Angela?',
   '¿Angela?',
-  'A su servicio, Vivach.',
+  'A su servicio, Angela.',
   'A la espera.',
   'Despierto, Angela.',
 ]
@@ -129,7 +129,7 @@ const BY_TOOL: Rule[] = [
   {
     server: /elevenlabs|openai-tts/,
     tool: /speech|\bvoice\b|\btts\b|text_to_sound/,
-    lines: ['Sintetizando.', 'En ello, Vivach.'],
+    lines: ['Sintetizando.', 'En ello, Angela.'],
   },
   {
     server: /spotify|sonos/,
@@ -139,7 +139,7 @@ const BY_TOOL: Rule[] = [
   {
     server: /^home|homeassistant|\bhue\b|\bhass\b/,
     tool: /\blights?\b|thermostat|\bdimmer\b/,
-    lines: ['Ajustándolo.', 'Me ocupo de ello, Vivach.'],
+    lines: ['Ajustándolo.', 'Me ocupo de ello, Angela.'],
   },
   {
     server: /github|linear|jira|sentry/,
