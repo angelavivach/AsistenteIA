@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleIdentifier</key><string>local.jarvis.calendar</string>
+  <key>CFBundleName</key><string>Jarvis Calendar</string>
+  <key>NSCalendarsFullAccessUsageDescription</key><string>Jarvis lee y modifica tu calendario cuando se lo pides por voz.</string>
+  <key>NSCalendarsUsageDescription</key><string>Jarvis lee y modifica tu calendario cuando se lo pides por voz.</string>
+</dict>
+</plist>
