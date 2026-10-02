@@ -7,6 +7,14 @@ consultar y cambiar tu calendario.
 Basado en [J.A.R.V.I.S.](https://github.com/adewaskar/jarvis) de adewaskar
 (licencia MIT), adaptado al español y rediseñado.
 
+## Partes del proyecto
+
+| Parte | Dónde | Qué es |
+|---|---|---|
+| **Odín** | raíz (`src/`, `bridge/`, `public/`, `scripts/`) | El asistente de voz. Esta guía. |
+| **Home Assistant** | [home-assistant/](home-assistant/README.md) | El servidor de casa en una Raspberry Pi y cómo se conecta Odín. |
+| **Pantalla** | [pantalla/](pantalla/README.md) | La pantalla táctil de pared con el panel de casa y acceso a Odín. |
+
 ---
 
 ## Qué hace
