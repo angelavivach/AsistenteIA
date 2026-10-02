@@ -117,7 +117,16 @@ console.log('\nODÍN arrancando — el cerebro y la cara.\n')
 run('bridge', process.execPath, ['bridge/server.mjs'], '36', bridgeEnv)
 // npm is a shell script on most systems; call the vite binary directly so we do
 // not need shell:true (which would break the argument handling above).
-run('face', process.execPath, ['node_modules/vite/bin/vite.js'], '35', {})
+// A wall screen reaches Odín over the home network only when .env names this
+// Mac in ODIN_PANTALLA_HOST; otherwise the face stays on localhost.
+try {
+  process.loadEnvFile(new URL('../.env', import.meta.url))
+} catch {
+  // No .env: nothing to read.
+}
+const pantalla = process.env.ODIN_PANTALLA_HOST?.trim()
+if (pantalla) console.log(`  pantalla: Odín también en http://${pantalla}:${port || 5173}\n`)
+run('face', process.execPath, ['node_modules/vite/bin/vite.js', ...(pantalla ? ['--host'] : [])], '35', {})
 
 console.log(
   '\nWhen it says the dev server is ready, open the URL it prints in Chrome,\n' +

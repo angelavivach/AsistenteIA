@@ -79,7 +79,11 @@ const EXTRA_ORIGINS = new Set(
 )
 const ALLOW_NO_ORIGIN = process.env.JARVIS_ALLOW_NO_ORIGIN === '1'
 
-const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]'])
+// ODIN_PANTALLA_HOST is this Mac's name on the home network (mac-de-angela.local),
+// set only when a wall screen should open Odín from across the house. It is
+// trusted like localhost — same dev ports — and nothing else is.
+const PANTALLA_HOST = process.env.ODIN_PANTALLA_HOST?.trim().toLowerCase()
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]', ...(PANTALLA_HOST ? [PANTALLA_HOST] : [])])
 
 /**
  * Vite takes the next free port when 5173 is busy and `vite preview` starts at

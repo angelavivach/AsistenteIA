@@ -70,8 +70,13 @@ export const BACKEND: 'bridge' | 'direct' = choice(
  * places that talk to it, so moving off the default port is a single edit.
  * `wss://` maps to `https://` on its own, which is why this is a prefix swap
  * rather than a hardcoded scheme.
+ *
+ * By default the bridge is on the same machine that served the page: opened as
+ * localhost on the Mac that is localhost, and opened from the wall screen as
+ * http://mac.local:5173 it is mac.local — not the screen itself.
  */
-export const BRIDGE_WS_URL = str(import.meta.env.VITE_BRIDGE_URL) ?? 'ws://localhost:8787'
+export const BRIDGE_WS_URL =
+  str(import.meta.env.VITE_BRIDGE_URL) ?? `ws://${location.hostname || 'localhost'}:8787`
 export const BRIDGE_HTTP_URL = BRIDGE_WS_URL.replace(/^ws/, 'http')
 
 /**

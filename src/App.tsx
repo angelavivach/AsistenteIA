@@ -3,6 +3,7 @@ import { Scene } from './scene/Scene'
 import { Hud } from './ui/Hud'
 import { Boot } from './ui/Boot'
 import { HomePad } from './ui/HomePad'
+import { Volver } from './ui/Volver'
 import { Ignition } from './ui/Ignition'
 import { Diagnostics } from './ui/Diagnostics'
 import { useStore } from './store'
@@ -725,6 +726,7 @@ export default function App() {
       <Scene />
       <Hud />
       <HomePad />
+      <Volver />
       <Boot />
       <Diagnostics />
       <Ignition onStart={() => void powerOn()} />

@@ -1969,6 +1969,28 @@ kbd {
   background: #000;
 }
 
+/* ------------------------------------------------------------------ volver */
+/* Back to the wall panel, only when the panel opened Odín. Same pill as CASA. */
+
+.volver {
+  position: fixed;
+  left: 36px;
+  bottom: 30px;
+  z-index: 20;
+  padding: 9px 18px;
+  font-family: 'Jost', system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.4em;
+  color: #e9dcff;
+  background: rgba(20, 10, 34, 0.55);
+  border: 1px solid rgba(201, 166, 255, 0.35);
+  border-radius: 999px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+.volver:hover { border-color: #ff5fb8; box-shadow: 0 0 18px rgba(255, 95, 184, 0.45); }
+
 /* ---------------------------------------------------------------- home pad */
 /* The house as a glass panel over the orb, in the same violet register. */
 
