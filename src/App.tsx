@@ -34,6 +34,7 @@ import {
 import { startAnalyser, micLevel } from './lib/audio'
 import { probeCapabilities } from './lib/capabilities'
 import { playChime } from './lib/chime'
+import { startDucking } from './lib/duck'
 import { env } from './config'
 
 /**
@@ -430,6 +431,9 @@ export default function App() {
     // The interface is JARVIS's to drive. These arrive out of band, pushed
     // mid-turn the way panels are, so a command can retint the reactor or put
     // something into orbit while he is still speaking the sentence about it.
+    // Spotify drops while he is awake, so the mic hears the user, not the song.
+    startDucking()
+
     // A timer or alarm went off: chime, then say it, whatever he was doing.
     watchAlarms(async (a) => {
       silence()

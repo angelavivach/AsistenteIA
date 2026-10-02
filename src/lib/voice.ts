@@ -63,6 +63,9 @@ export type Voice = {
 
 /** One utterance often produces several partials containing his name. */
 const WAKE_DEBOUNCE = 1500
+/** Longest segment worth transcribing while waiting for the wake word. "Oye Odín, pon
+ *  mi lista de verano en el Mac" fits comfortably; a song playing does not. */
+const WAKE_MAX_MS = 8000
 
 /**
  * His name, and the only wake phrase.
@@ -546,7 +549,14 @@ async function startElevenVoice(h: VoiceHandlers): Promise<Voice> {
         h.onSpeechStart()
       }
     },
-    onEnd: (blob) => {
+    onEnd: (blob, ms) => {
+      // Waiting for his name, a long unbroken stretch of sound is music or a
+      // TV, not someone saying "Oye Odín" — and transcribing it would spend
+      // ElevenLabs minutes on song lyrics. Wake phrases are a few seconds long.
+      if (h.mode() === 'wake' && ms > WAKE_MAX_MS) {
+        drop(`ignored ${Math.round(ms / 1000)}s of continuous sound (music?)`)
+        return
+      }
       pendingAudio.push(blob)
       void drain()
     },

@@ -111,6 +111,33 @@ async function api(path, init = {}) {
   return data
 }
 
+// Ducking ---------------------------------------------------------------------
+//
+// While ODIN is awake the music drops to a murmur, so the microphone hears the
+// user rather than the lyrics, and comes back when the conversation is over.
+
+let ducked = null // { device, volume } while lowered
+
+async function duck(on) {
+  if (!(await loadTokens())) return
+  if (on) {
+    if (ducked) return
+    const s = await api('/me/player').catch(() => null)
+    const dev = s?.device
+    if (!s?.is_playing || !dev?.id || dev.volume_percent == null || dev.volume_percent <= 12) return
+    ducked = { device: dev.id, volume: dev.volume_percent }
+    const low = Math.max(5, Math.round(dev.volume_percent * 0.2))
+    await api(`/me/player/volume?volume_percent=${low}&device_id=${dev.id}`, { method: 'PUT' }).catch(() => {
+      ducked = null
+    })
+  } else {
+    if (!ducked) return
+    const { device, volume } = ducked
+    ducked = null
+    await api(`/me/player/volume?volume_percent=${volume}&device_id=${device}`, { method: 'PUT' }).catch(() => {})
+  }
+}
+
 // Login endpoints (served by the bridge) --------------------------------------
 
 const b64url = (buf) => buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
@@ -126,6 +153,30 @@ export async function handleSpotify(req, res) {
   const html = (status, title, body) => {
     res.writeHead(status, { 'content-type': 'text/html; charset=utf-8' })
     res.end(page(title, body))
+  }
+
+  if (req.method === 'POST' && req.url === '/spotify/duck') {
+    // Only from the ODIN page itself.
+    if (!req.headers.origin) {
+      res.writeHead(403)
+      res.end()
+      return true
+    }
+    let body = ''
+    for await (const chunk of req) {
+      body += chunk
+      if (body.length > 256) break
+    }
+    let on = false
+    try {
+      on = JSON.parse(body || '{}').on === true
+    } catch {
+      /* treat as off */
+    }
+    if (spotifyConfigured()) await duck(on).catch(() => {})
+    res.writeHead(204, { 'access-control-allow-origin': req.headers.origin, vary: 'origin' })
+    res.end()
+    return true
   }
 
   if (!spotifyConfigured()) {
@@ -365,6 +416,10 @@ export function spotifyServer() {
               shuffle_off: ['PUT', '/me/player/shuffle', 'state=false'],
               repeat_on: ['PUT', '/me/player/repeat', 'state=context'],
               repeat_off: ['PUT', '/me/player/repeat', 'state=off'],
+            }
+            if (action === 'volume' && ducked && !device) {
+              ducked.volume = Math.round(volume ?? 50)
+              return ok('Done. The new volume applies as soon as ODIN stops listening.')
             }
             const [method, path, q] = calls[action]
             const query = amp(q ?? '')
