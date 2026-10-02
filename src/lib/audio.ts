@@ -16,7 +16,12 @@ export async function getMic(): Promise<MediaStream> {
       echoCancellation: true,
       noiseSuppression: true,
       autoGainControl: true,
-    },
+      channelCount: 1,
+      // Chrome's voice isolation, where the platform provides it: keeps the
+      // speaking voice and strips music and background noise. Ignored by
+      // browsers that do not know it, so it costs nothing to ask.
+      voiceIsolation: true,
+    } as MediaTrackConstraints,
   })
   return stream
 }
