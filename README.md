@@ -21,6 +21,10 @@ Basado en [J.A.R.V.I.S.](https://github.com/adewaskar/jarvis) de adewaskar
 - **Gestiona tu calendario.** En Mac usa el Calendario de macOS (iCloud, Google
   o Exchange); en Windows se conecta directamente a **iCloud**. **Antes de
   crear, mover, renombrar o borrar un evento te lo lee y espera tu «sí».**
+- **Pone música en Spotify** (Premium): canciones, álbumes, artistas, tus
+  listas o tus «me gusta», donde tengas Spotify activo o en el equipo que digas
+  («ponla en el Mac», «en el Windows», «en el móvil»). Si Spotify está cerrado en
+  el ordenador de Odín, lo abre. También pausa, siguiente, volumen y «¿qué suena?».
 - **Controla tu casa** con **Home Assistant**: luces, enchufes, escenas… por voz
   («enciende la luz del salón») o desde el **home pad** (botón **CASA** o tecla
   **C**), con los aparatos agrupados por habitación. Cerraduras, alarmas y
@@ -174,6 +178,7 @@ Variables (todas opcionales):
 | `ICLOUD_DEFAULT_CALENDAR` | el primero | Calendario para eventos nuevos |
 | `CALENDAR_BACKEND` | auto | `icloud` para usar iCloud también en Mac |
 | `HA_URL` / `HA_TOKEN` | — | Home Assistant (dirección y token de larga duración) |
+| `SPOTIFY_CLIENT_ID` | — | Spotify (ver abajo) |
 
 Las variables conservan el prefijo `JARVIS_` del proyecto original.
 
@@ -181,6 +186,18 @@ Las variables conservan el prefijo `JARVIS_` del proyecto original.
 > como *Mariano Gómez*): con el plan gratuito no se pueden usar por API. Hace
 > falta el plan Starter o superior. Las voces incluidas (George, Daniel…) sí
 > funcionan gratis.
+
+### Conectar Spotify (una sola vez)
+
+1. Entra en **developer.spotify.com** → *Dashboard* → **Create app**.
+   - *Redirect URI:* `http://127.0.0.1:8787/spotify/callback`
+   - *Which API/SDKs are you planning to use?* **Web API**
+2. Copia el **Client ID** en `.env` como `SPOTIFY_CLIENT_ID=...` y reinicia Odín.
+3. Abre **http://127.0.0.1:8787/spotify/login** y acepta. La sesión queda
+   guardada en `~/.odin/spotify.json`, fuera del proyecto.
+
+Para que suene en un equipo, Spotify tiene que estar abierto en él; en el
+ordenador donde corre Odín lo abre él solo.
 
 ---
 

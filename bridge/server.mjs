@@ -23,6 +23,7 @@ import { chromeAvailable, chromeServer } from './chrome.mjs'
 import { visionServer } from './vision.mjs'
 import { calendarServer } from './calendar.mjs'
 import { handleHome, homeConfigured } from './home.mjs'
+import { handleSpotify, spotifyConfigured, spotifyServer } from './spotify.mjs'
 import { homedir, tmpdir } from 'node:os'
 import { readFileSync, realpathSync } from 'node:fs'
 import { readFile, realpath, stat } from 'node:fs/promises'
@@ -321,6 +322,9 @@ function decideTool(name) {
     // garage doors — are held back by the persona's confirmation rule.
     if (server === 'casa') return true
 
+    // Music. Nothing here can do harm beyond playing the wrong song.
+    if (server === 'jarvis_spotify') return true
+
     const tool = mcpToolOf(name)
     if (EFFECTFUL_VERB.test(tool) && !VETO_EXEMPT.has(`${server}__${tool}`)) {
       return ALLOW_WRITES
@@ -414,6 +418,14 @@ CALENDAR. You can read and change the user's Calendar with the calendar_* tools.
 Every change — create, move, rename or delete — is read back first in one short
 sentence and done only after the user says yes. A yes covers exactly the change
 you read back, nothing more.
+
+MUSIC. With the spotify tools you play what the user asks for: songs, albums,
+artists, their playlists or their liked songs, on whichever device they name
+("en el Mac", "en el Windows", "en el móvil") or, if they name none, wherever
+Spotify is active. Act at once, no confirmation; then say in one short line
+what is playing and, if it is not the active device, where. "Pon música" with
+nothing else means their liked songs on shuffle. If no device is available,
+say Spotify needs to be open on it.
 
 HOME. With the casa tools you control the user's home through Home Assistant:
 lights, plugs, scenes, climate and so on. Lights, plugs, scenes and media act
@@ -755,6 +767,8 @@ const handleRequest = async (req, res) => {
 
   // The home pad: device list and buttons, relayed to Home Assistant.
   if (await handleHome(req, res, cors)) return
+  // Spotify sign-in (login + callback pages).
+  if (await handleSpotify(req, res)) return
 
   if (req.method === 'GET' && req.url === '/health') {
     // The browser reads this once at boot to decide which voice engine to use.
@@ -1300,6 +1314,8 @@ wss.on('connection', (socket) => {
         jarvis_eyes: visionServer(ask),
         // The macOS Calendar app; every change is confirmed by voice first.
         jarvis_calendar: calendarServer(),
+        // Spotify, when a client id is configured.
+        ...(spotifyConfigured() ? { jarvis_spotify: spotifyServer() } : {}),
       },
       // A plain system prompt, not the claude_code preset. The preset is
       // tuned for a coding agent — verbose, file-oriented, and a large chunk
