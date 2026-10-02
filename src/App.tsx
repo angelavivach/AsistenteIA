@@ -31,7 +31,7 @@ import {
   usingBridge,
   type Msg,
 } from './lib/brain'
-import { startAnalyser, micLevel } from './lib/audio'
+import { startAnalyser, micLevel, primeAudio } from './lib/audio'
 import { probeCapabilities } from './lib/capabilities'
 import { playChime } from './lib/chime'
 import { startDucking } from './lib/duck'
@@ -355,6 +355,8 @@ export default function App() {
 
   const ignite = async () => {
     const s = store.getState()
+    // First, before any await: claim the audio while the click still counts.
+    primeAudio()
 
     // Must happen inside the click handler — browsers won't start an
     // AudioContext or speech synthesis without a user gesture.

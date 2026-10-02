@@ -1,4 +1,4 @@
-import { getMic } from './audio'
+import { getMic, listeningContext } from './audio'
 
 /**
  * Voice-activity detection and segment capture.
@@ -118,10 +118,9 @@ export async function startVad(h: VadHandlers): Promise<Vad> {
   }
 
   const mime = pickMime()
-  const ctx = new AudioContext()
-  // Some browsers start an AudioContext suspended even after a gesture; resume
-  // is a no-op when it is already running.
-  void ctx.resume()
+  // The context primed in the INICIAR click (see listeningContext): one made
+  // here, after the boot sequence, would start suspended and hear nothing.
+  const ctx = listeningContext()
   const source = ctx.createMediaStreamSource(stream)
   const analyser = ctx.createAnalyser()
   analyser.fftSize = 1024
@@ -258,8 +257,8 @@ export async function startVad(h: VadHandlers): Promise<Vad> {
       cancelAnimationFrame(raf)
       discardRecorder()
       try {
+        // Disconnect only: the context is shared with the reactor's analyser.
         source.disconnect()
-        void ctx.close()
       } catch {
         /* noop */
       }
