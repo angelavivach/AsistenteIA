@@ -91,8 +91,8 @@ Tiempo aproximado: 1 hora la primera vez.
 | Odín dice que un aparato no está disponible | Exponlo en Asistentes de voz → Exponer |
 | La Pi se reinicia o se cuelga | Casi siempre es la fuente: usa la oficial de 27 W |
 
-## Siguiente fase: pantallas
+---
 
-Una segunda Raspberry con la **Touch Display 2** en modo kiosco, mostrando el
-panel de la casa, y más adelante con micrófono para hablar con Odín desde cada
-habitación.
+## Siguiente: la pantalla de pared
+
+Panel táctil con los colores de Odín: mira [pantalla/README.md](../pantalla/README.md).
