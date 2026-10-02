@@ -25,6 +25,7 @@ import {
   watchBlades,
   watchCapture,
   watchUi,
+  watchAlarms,
   watchConnection,
   connectedLabels,
   usingBridge,
@@ -32,6 +33,7 @@ import {
 } from './lib/brain'
 import { startAnalyser, micLevel } from './lib/audio'
 import { probeCapabilities } from './lib/capabilities'
+import { playChime } from './lib/chime'
 import { env } from './config'
 
 /**
@@ -426,6 +428,18 @@ export default function App() {
     // The interface is JARVIS's to drive. These arrive out of band, pushed
     // mid-turn the way panels are, so a command can retint the reactor or put
     // something into orbit while he is still speaking the sentence about it.
+    // A timer or alarm went off: chime, then say it, whatever he was doing.
+    watchAlarms(async (a) => {
+      silence()
+      store.getState().setCaption(a.text)
+      store.getState().fireEffect?.('pulse')
+      await playChime()
+      const line = createSpeaker()
+      speaker.current = line
+      line.say(a.text)
+      void line.end()
+    })
+
     watchUi((op, args) => {
       const s = store.getState()
       const a = (args ?? {}) as Record<string, never>

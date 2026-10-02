@@ -35,6 +35,8 @@ type Frame = {
   seconds?: number
   when?: string
   servers?: Array<string | { name?: string }>
+  kind?: string
+  label?: string
 }
 
 /** Every question gets an id so its answer can be told from anyone else's. */
@@ -56,6 +58,8 @@ const SERVER_NAMES: Record<string, string> = {
   jarvis_eyes: 'cámara',
   jarvis_calendar: 'calendario',
   jarvis_spotify: 'spotify',
+  jarvis_apps: 'correo · youtube · notas',
+  jarvis_timers: 'alarmas',
   casa: 'casa',
 }
 function friendlyServer(name: string): string {
@@ -114,6 +118,13 @@ export function watchBlades(fn: (blade: Blade) => void) {
 let onUi: ((op: string, args: any) => void) | null = null
 export function watchUi(fn: (op: string, args: any) => void) {
   onUi = fn
+}
+
+/** A timer or alarm going off, pushed by the bridge whenever it happens. */
+export type Alarm = { kind: 'timer' | 'alarm'; label: string; text: string }
+let onAlarm: ((a: Alarm) => void) | null = null
+export function watchAlarms(fn: (a: Alarm) => void) {
+  onAlarm = fn
 }
 
 /**
@@ -220,6 +231,8 @@ function dispatch(ws: WebSocket) {
           .then(reply)
           .catch((err) => reply({ error: String(err?.message ?? err) }))
       }
+    } else if (msg.type === 'alarm' && msg.text) {
+      onAlarm?.({ kind: msg.kind === 'alarm' ? 'alarm' : 'timer', label: msg.label ?? '', text: msg.text })
     } else if (msg.type === 'ui' && msg.op) {
       // A `ui` frame with no args is normal — reset and clear take none — so an
       // absent args object is an empty one, not a reason to drop the command.

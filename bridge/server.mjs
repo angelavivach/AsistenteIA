@@ -24,6 +24,8 @@ import { visionServer } from './vision.mjs'
 import { calendarServer } from './calendar.mjs'
 import { handleHome, homeConfigured } from './home.mjs'
 import { handleSpotify, spotifyConfigured, spotifyServer } from './spotify.mjs'
+import { appsServer } from './apps.mjs'
+import { startTimers, timersServer } from './timers.mjs'
 import { homedir, tmpdir } from 'node:os'
 import { readFileSync, realpathSync } from 'node:fs'
 import { readFile, realpath, stat } from 'node:fs/promises'
@@ -325,6 +327,10 @@ function decideTool(name) {
     // Music. Nothing here can do harm beyond playing the wrong song.
     if (server === 'jarvis_spotify') return true
 
+    // Opening the inbox or a video, writing a note, setting a timer: all
+    // things the user asks for by name, and none of them destroys anything.
+    if (server === 'jarvis_apps' || server === 'jarvis_timers') return true
+
     const tool = mcpToolOf(name)
     if (EFFECTFUL_VERB.test(tool) && !VETO_EXEMPT.has(`${server}__${tool}`)) {
       return ALLOW_WRITES
@@ -426,6 +432,14 @@ Spotify is active. Act at once, no confirmation; then say in one short line
 what is playing and, if it is not the active device, where. "Pon música" with
 nothing else means their liked songs on shuffle. If no device is available,
 say Spotify needs to be open on it.
+
+EVERYDAY. You can open the user's mail (open_mail) and YouTube (youtube_play
+for a specific video, youtube_open for the site or a search) in the browser on
+this computer; write and read their notes (notes_write / notes_read — a list
+such as the shopping list is one note you append to); and set timers and
+alarms (timer_set, alarm_set, timers_list, timer_cancel). Do these at once,
+then confirm in one short line: "Temporizador de diez minutos en marcha.",
+"Alarma a las siete de mañana.", "Anotado.". You cannot read email contents.
 
 HOME. With the casa tools you control the user's home through Home Assistant:
 lights, plugs, scenes, climate and so on. Lights, plugs, scenes and media act
@@ -1137,6 +1151,13 @@ const RESULT_FAILURES = {
   default: 'The turn ended without an answer.',
 }
 
+/** Every open page, so something that happens on its own (an alarm) reaches all of them. */
+const clients = new Set()
+await startTimers((msg) => {
+  for (const send of clients) send(msg)
+  if (msg.type === 'alarm') console.log(`[odin] alarma: ${msg.text}`)
+})
+
 wss.on('connection', (socket) => {
   console.log('[jarvis] client connected')
 
@@ -1170,6 +1191,7 @@ wss.on('connection', (socket) => {
   const send = (msg) => {
     if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(msg))
   }
+  clients.add(send)
 
   /**
    * Which question the agent is currently answering.
@@ -1316,6 +1338,9 @@ wss.on('connection', (socket) => {
         jarvis_calendar: calendarServer(),
         // Spotify, when a client id is configured.
         ...(spotifyConfigured() ? { jarvis_spotify: spotifyServer() } : {}),
+        // Mail, YouTube and notes on this computer; timers and alarms.
+        jarvis_apps: appsServer(),
+        jarvis_timers: timersServer(),
       },
       // A plain system prompt, not the claude_code preset. The preset is
       // tuned for a coding agent — verbose, file-oriented, and a large chunk
@@ -1557,6 +1582,7 @@ wss.on('connection', (socket) => {
   })
 
   socket.on('close', () => {
+    clients.delete(send)
     console.log('[jarvis] client disconnected')
     closed = true
     deliver?.(null)

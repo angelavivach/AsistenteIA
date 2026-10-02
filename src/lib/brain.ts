@@ -69,6 +69,11 @@ export function watchUi(fn: (op: string, args: any) => void): void {
   if (usingBridge) bridge.watchUi(fn)
 }
 
+/** Timers and alarms going off. Only the bridge keeps them. */
+export function watchAlarms(fn: (a: bridge.Alarm) => void): void {
+  if (usingBridge) bridge.watchAlarms(fn)
+}
+
 /**
  * The one thing the bridge asks US for.
  *
