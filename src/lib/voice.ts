@@ -77,8 +77,16 @@ const WAKE_DEBOUNCE = 1500
  * used to be silently discarded, so the wake word "just didn't work" with no
  * indication why. Better a rare false wake than a name that does not answer.
  */
-const WAKE =
-  /(?<!\p{L})(?:(?:hey|hi|ok|okay|oye|hola|ey)[\s,]+)?(?:od[ií]n|aud[ií]n|oud[ií]n|hod[ií]n|oding|odim|odi)(?!\p{L})/iu
+// The second alternative is what Scribe actually wrote for "Oye Odín" in real
+// use — "Oye, ¿dónde…", "O yo dimpo…" — accepted only at the very start, after
+// "oye", so an ordinary "¿dónde está?" mid-sentence does not wake him.
+const WAKE = new RegExp(
+  [
+    '(?<!\\p{L})(?:(?:hey|hi|ok|okay|oye|hola|ey)[\\s,]+)?(?:od[ií]n|aud[ií]n|oud[ií]n|hod[ií]n|oding|odim|odi)(?!\\p{L})',
+    '^\\s*[¡¿]?(?:oye|o\\s?ye|o\\s?yo|hoy)[\\s,¿¡]+(?:d[oó]nde|dimpo|dimp|dim|din|o\\s?d[ií]n)(?!\\p{L})',
+  ].join('|'),
+  'iu',
+)
 
 /** Everything after the wake phrase, which is usually the actual command. */
 function afterWake(text: string): string {

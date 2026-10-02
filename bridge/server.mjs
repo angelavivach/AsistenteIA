@@ -24,7 +24,7 @@ import { visionServer } from './vision.mjs'
 import { calendarServer } from './calendar.mjs'
 import { handleHome, homeConfigured } from './home.mjs'
 import { handleSpotify, spotifyConfigured, spotifyServer } from './spotify.mjs'
-import { appsServer } from './apps.mjs'
+import { appsServer, setPreferredBrowser } from './apps.mjs'
 import { startTimers, timersServer } from './timers.mjs'
 import { homedir, tmpdir } from 'node:os'
 import { readFileSync, realpathSync } from 'node:fs'
@@ -1527,6 +1527,11 @@ wss.on('connection', (socket) => {
     try {
       msg = JSON.parse(raw.toString())
     } catch {
+      return
+    }
+
+    if (msg.type === 'hello') {
+      setPreferredBrowser(msg.browser)
       return
     }
 

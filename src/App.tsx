@@ -68,10 +68,12 @@ const newId = () =>
  *  that woke him as "audín" gets that word sent on to the model as a question. */
 const NAME = '(?:od[ií]n|aud[ií]n|oud[ií]n|hod[ií]n|oding|odim|odi)(?!\\p{L})'
 const LEAD = '(?:(?:hey|hi|ok|okay|oye|hola|ey)[\\s,]+)?'
+/** Scribe's mishearings of "Oye Odín" at the start of a turn (see WAKE in voice.ts). */
+const MISHEARD = '[¡¿]?(?:oye|o\\s?ye|o\\s?yo|hoy)[\\s,¿¡]+(?:d[oó]nde|dimpo|dimp|dim|din|o\\s?d[ií]n)(?!\\p{L})'
 /** A bare vocative — "Odín", "oye Odín" — with nothing asked. */
-const BARE_NAME = new RegExp(`^${LEAD}${NAME}[\\s,.!?¡¿]*$`, 'iu')
+const BARE_NAME = new RegExp(`^(?:${LEAD}${NAME}|${MISHEARD})[\\s,.!?¡¿]*$`, 'iu')
 /** A leading vocative on a real command: "Odín, ¿qué tiempo hace?". */
-const LEADING_NAME = new RegExp(`^${LEAD}${NAME}[\\s,.:!?¡¿-]*`, 'iu')
+const LEADING_NAME = new RegExp(`^(?:${LEAD}${NAME}|${MISHEARD})[\\s,.:!?¡¿-]*`, 'iu')
 
 export default function App() {
   const store = useStore

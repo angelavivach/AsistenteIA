@@ -42,6 +42,19 @@ type Frame = {
 /** Every question gets an id so its answer can be told from anyone else's. */
 let askSeq = 0
 
+/** Which browser this page is running in. Brave and Opera present as Chrome, so they are checked first. */
+function detectBrowser(): string {
+  const ua = navigator.userAgent
+  if ((navigator as Navigator & { brave?: unknown }).brave) return 'brave'
+  if (/OPR\/|Opera/.test(ua)) return 'opera'
+  if (/Edg\//.test(ua)) return 'edge'
+  if (/Vivaldi/.test(ua)) return 'vivaldi'
+  if (/Firefox\//.test(ua)) return 'firefox'
+  if (/Chrome\//.test(ua)) return 'chrome'
+  if (/Safari\//.test(ua)) return 'safari'
+  return ''
+}
+
 let socket: WebSocket | null = null
 let connecting: Promise<WebSocket> | null = null
 
@@ -274,6 +287,8 @@ function connect(): Promise<WebSocket> {
     ws.onopen = () => {
       socket = ws
       attempt = 0
+      // So links ODIN opens land in the browser the user is actually using.
+      ws.send(JSON.stringify({ type: 'hello', browser: detectBrowser() }))
       dispatch(ws)
       settle(null)
       onConnection?.(everConnected ? 'reconnected' : 'open')

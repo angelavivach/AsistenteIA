@@ -27,11 +27,70 @@ function run(cmd, args, input) {
   })
 }
 
-/** Open a URL in the default browser. No shell, so nothing in the URL is ever interpreted. */
-export function openUrl(url) {
-  if (process.platform === 'darwin') return run('open', [url])
-  // rundll32 rather than `start`: cmd would treat the & in a query string as a command separator.
-  if (process.platform === 'win32') return run('rundll32', ['url.dll,FileProtocolHandler', url])
+/**
+ * The browser the ODIN page was last opened in — reported by the page itself
+ * when it connects — so links open where the user already is, not in whatever
+ * the system default happens to be.
+ */
+let preferred = ''
+export function setPreferredBrowser(name) {
+  const known = ['chrome', 'brave', 'opera', 'edge', 'vivaldi', 'firefox', 'safari']
+  if (known.includes(name)) {
+    if (name !== preferred) console.log(`[odin] enlaces en: ${name}`)
+    preferred = name
+  }
+}
+
+// App names on macOS, tried in order (Opera GX looks exactly like Opera from the page).
+const MAC_APPS = {
+  chrome: ['Google Chrome'],
+  brave: ['Brave Browser'],
+  opera: ['Opera', 'Opera GX'],
+  edge: ['Microsoft Edge'],
+  vivaldi: ['Vivaldi'],
+  firefox: ['Firefox'],
+  safari: ['Safari'],
+}
+// Names Windows resolves through App Paths for `start`.
+const WIN_EXES = {
+  chrome: ['chrome'],
+  brave: ['brave'],
+  opera: ['opera', 'launcher'],
+  edge: ['msedge'],
+  vivaldi: ['vivaldi'],
+  firefox: ['firefox'],
+}
+
+/** Open a URL — in the user's current browser when known, else the system default. No shell interprets the URL. */
+export async function openUrl(url) {
+  if (process.platform === 'darwin') {
+    for (const app of MAC_APPS[preferred] ?? []) {
+      try {
+        return await run('open', ['-a', app, url])
+      } catch {
+        /* not installed under that name; try the next */
+      }
+    }
+    return run('open', [url])
+  }
+  if (process.platform === 'win32') {
+    // A URL from encodeURIComponent never contains a double quote, but make sure,
+    // because it is about to sit inside one on cmd's verbatim command line.
+    const safe = url.replace(/"/g, '%22')
+    for (const exe of WIN_EXES[preferred] ?? []) {
+      try {
+        return await new Promise((resolve, reject) =>
+          execFile('cmd', ['/d', '/c', 'start', '""', exe, `"${safe}"`], { windowsVerbatimArguments: true, timeout: 15_000 }, (err) =>
+            err ? reject(err) : resolve(''),
+          ),
+        )
+      } catch {
+        /* not found; try the next */
+      }
+    }
+    // rundll32 rather than `start`: cmd would treat the & in a query string as a command separator.
+    return run('rundll32', ['url.dll,FileProtocolHandler', url])
+  }
   return run('xdg-open', [url])
 }
 
