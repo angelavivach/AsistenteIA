@@ -335,7 +335,10 @@ async function find(query, kind) {
     if (mine) return { uri: mine.uri, name: mine.name, owner: 'tuya' }
   }
   const type = kind === 'playlist' ? 'playlist' : kind
-  const data = await api(`/search?${new URLSearchParams({ q: query, type, limit: '5', market: 'from_token' })}`)
+  // No market=from_token: it needs the user-read-private scope, which we don't
+  // ask for, and Spotify answers 403 to every search. A user token already
+  // narrows the results to the account's own country.
+  const data = await api(`/search?${new URLSearchParams({ q: query, type, limit: '5' })}`)
   const item = (data?.[`${type}s`]?.items ?? []).filter(Boolean)[0]
   if (!item) return null
   const by = item.artists?.map((a) => a.name).join(', ') ?? item.owner?.display_name ?? ''
