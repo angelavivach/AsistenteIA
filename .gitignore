@@ -28,3 +28,6 @@ public/mediapipe/
 
 # Claves y contraseñas de Odín (nunca subirlas)
 .env
+
+# Panel generado con tus aparatos (npm run panel:casa)
+pantalla/panel-casa.yaml

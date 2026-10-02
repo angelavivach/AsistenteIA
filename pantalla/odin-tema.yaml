@@ -1,0 +1,51 @@
+# Tema «Odín» para Home Assistant: los colores de la interfaz de Odín
+# (fondo casi negro, violeta, rosa y naranja) en el panel de la pantalla.
+#
+# Cómo instalarlo: copia este archivo a la carpeta /config/themes/ de Home
+# Assistant (ver pantalla/README.md, apartado 1).
+
+Odín:
+  # Fondo y tarjetas
+  primary-background-color: "#07050c"
+  secondary-background-color: "#120a1f"
+  lovelace-background: "radial-gradient(ellipse at 50% 0%, #2a1240 0%, #07050c 60%)"
+  card-background-color: "rgba(20, 10, 34, 0.72)"
+  ha-card-background: "rgba(20, 10, 34, 0.72)"
+  ha-card-border-color: "rgba(201, 166, 255, 0.22)"
+  ha-card-border-radius: "18px"
+  ha-card-box-shadow: "0 0 24px rgba(201, 166, 255, 0.08)"
+
+  # Texto
+  primary-text-color: "#f6efff"
+  secondary-text-color: "#8a7a9e"
+  disabled-text-color: "#5a4d6b"
+
+  # Acentos: violeta de Odín y rosa al estar activo
+  primary-color: "#c9a6ff"
+  accent-color: "#ff5fb8"
+  state-icon-color: "#c9a6ff"
+  state-active-color: "#ff5fb8"
+  state-light-active-color: "#ff9a5c"
+  state-switch-active-color: "#ff5fb8"
+  state-fan-active-color: "#c47bff"
+  state-cover-active-color: "#c47bff"
+  state-scene-active-color: "#ff7ad0"
+  state-climate-heat-color: "#ff9a5c"
+  state-climate-cool-color: "#c9a6ff"
+  error-color: "#ff4d4d"
+
+  # Cabecera y barra lateral
+  app-header-background-color: "#07050c"
+  app-header-text-color: "#e9dcff"
+  sidebar-background-color: "#07050c"
+  sidebar-text-color: "#e9dcff"
+  sidebar-icon-color: "#8a7a9e"
+  sidebar-selected-icon-color: "#ff5fb8"
+  sidebar-selected-text-color: "#ff5fb8"
+  divider-color: "rgba(201, 166, 255, 0.15)"
+
+  # Controles
+  switch-checked-color: "#ff5fb8"
+  slider-color: "#ff5fb8"
+  paper-slider-knob-color: "#ff5fb8"
+  mdc-theme-primary: "#c9a6ff"
