@@ -49,6 +49,9 @@ Basado en [J.A.R.V.I.S.](https://github.com/adewaskar/jarvis) de adewaskar
 
 > **¿Windows?** Sigue la guía [docs/INSTALAR-WINDOWS.md](docs/INSTALAR-WINDOWS.md)
 > (Odín + calendario de iCloud + Home Assistant en un PC con Windows 11).
+>
+> **¿Home Assistant en una Raspberry Pi?** Sigue [docs/RASPBERRY-PI.md](docs/RASPBERRY-PI.md)
+> y comprueba la conexión con `npm run check:home`.
 
 - **macOS**. En Mac el calendario usa EventKit; en Windows se usa iCloud.
 - **Node.js 20 o superior** (`brew install node`).
