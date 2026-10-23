@@ -1,0 +1,17 @@
+ODÍN · TINTA — panel en el Kindle 4 (con jailbreak)
+====================================================
+
+Esta carpeta va en la raíz del Kindle: /mnt/us/odin  (al conectarlo por USB se ve como "Kindle/odin").
+
+1. Hacer el jailbreak del Kindle 4 (guía de MobileRead) e instalar "USBNetwork" para entrar por SSH.
+2. Entrar por SSH como root y ejecutar:
+
+     mntroot rw
+     echo '*/5 * * * * /bin/sh /mnt/us/odin/refresh.sh' >> /etc/crontab/root
+     mntroot ro
+     /etc/init.d/cron restart
+
+3. Activar el modo panel:      sh /mnt/us/odin/modo-panel.sh
+   Volver al Kindle normal:    sh /mnt/us/odin/modo-normal.sh
+
+La dirección del panel está en config.sh. Si cambia la IP del ordenador de Odín, edita ese archivo.

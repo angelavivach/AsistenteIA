@@ -191,3 +191,6 @@ export function calendarServer() {
     ],
   })
 }
+
+/** For the Kindle panel: the same calendar access the tools use. */
+export const calendarRequest = (request) => helper(request)

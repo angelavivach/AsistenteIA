@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recetas para mis macros</title>
+<style>
+  :root{--bg:#f4f5f2;--card:#fff;--ink:#22262b;--muted:#6b7280;--line:#e2e5e0;--accent:#2e8b6e;--accent-soft:#e8f5ef;--warn:#b45309;--warn-soft:#fdf3e4}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){--bg:#151719;--card:#1f2226;--ink:#e8eaed;--muted:#9aa1ab;--line:#2d3136;--accent:#5fc9a4;--accent-soft:#1d3b30;--warn:#f0b35c;--warn-soft:#3a2d18}
+  }
+  :root[data-theme="dark"]{--bg:#151719;--card:#1f2226;--ink:#e8eaed;--muted:#9aa1ab;--line:#2d3136;--accent:#5fc9a4;--accent-soft:#1d3b30;--warn:#f0b35c;--warn-soft:#3a2d18}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.45}
+  main{max-width:980px;margin:0 auto;padding:16px}
+  h1{font-size:1.6rem;margin:8px 0 4px}
+  h2{font-size:1.1rem;margin:0 0 10px}
+  .sub{color:var(--muted);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+  .grid-obj{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+  .grid-recetas{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  label{font-size:.85rem;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+  input,select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);width:100%}
+  button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:10px 16px;background:var(--accent);color:#fff;font-weight:600}
+  button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+  button.big{font-size:1.05rem;padding:14px 22px;width:100%}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .filtros{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px}
+  .check{flex-direction:row;align-items:center;gap:8px;color:var(--ink);font-size:.95rem}
+  .check input{width:auto}
+  .pill{display:inline-block;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:3px 10px;font-size:.82rem;font-weight:600}
+  .pill.warn{background:var(--warn-soft);color:var(--warn)}
+  .macros{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+  .macros span{font-size:.85rem;background:var(--line);border-radius:8px;padding:3px 8px}
+  .meta{color:var(--muted);font-size:.85rem}
+  .bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:6px}
+  .bar>div{height:100%;background:var(--accent)}
+  ul{margin:6px 0 0;padding-left:20px}
+  ol{margin:6px 0 0;padding-left:20px}
+  li{margin-bottom:4px}
+  .detalle-cab{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}
+  .vacio{color:var(--muted);text-align:center;padding:24px 0}
+  .card-receta{cursor:pointer;text-align:left}
+  .card-receta h3{margin:4px 0 6px;font-size:1rem}
+  .aviso{font-size:.85rem;color:var(--muted);margin-top:16px}
+  .hint{font-size:.8rem;color:var(--muted);margin-top:6px}
+  .fila{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line);font-size:.92rem}
+  .fila-c{width:80px;color:var(--muted);flex-shrink:0}
+  .fila-n{flex:1;cursor:pointer;text-decoration:underline;text-decoration-style:dotted}
+  .mini{padding:2px 8px;background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:8px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Recetas para mis macros</h1>
+  <p class="sub">Recetas fáciles que se ajustan a tus macros diarios. Pulsa el dado para una receta aleatoria.</p>
+
+  <section class="card">
+    <h2>Mis macros diarios</h2>
+    <div class="grid-obj">
+      <label>Kcal<input id="o-kcal" type="number" min="1000" step="10"></label>
+      <label>Proteína (g)<input id="o-p" type="number" min="0" step="1"></label>
+      <label>Carbohidratos (g)<input id="o-c" type="number" min="0" step="1"></label>
+      <label>Grasa (g)<input id="o-g" type="number" min="0" step="1"></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <span class="meta" id="o-check"></span>
+      <button class="ghost" id="o-reset" type="button" style="margin-left:auto">Restablecer</button>
+    </div>
+    <p class="hint">Punto de partida: 1.400 kcal y 115 g de proteína para 57 kg, 1,62 m, 22 años, con déficit moderado. Confírmalo con tu nutricionista.</p>
+  </section>
+
+  <section class="card">
+    <div class="filtros">
+      <label>Comida
+        <select id="f-comida">
+          <option value="todas">Todas</option>
+          <option value="desayuno">Desayuno</option>
+          <option value="comida">Comida</option>
+          <option value="snack">Snack</option>
+          <option value="cena">Cena</option>
+        </select>
+      </label>
+      <label>Tiempo máximo
+        <select id="f-tiempo">
+          <option value="0">Sin límite</option>
+          <option value="10">10 min</option>
+          <option value="20">20 min</option>
+          <option value="30">30 min</option>
+        </select>
+      </label>
+      <label class="check"><input id="f-encaja" type="checkbox" checked> Solo recetas que encajan en mis macros</label>
+    </div>
+    <button class="big" id="btn-dado" type="button">🎲 Receta aleatoria</button>
+  </section>
+
+  <section class="card" id="detalle">
+    <p class="vacio">Pulsa "Receta aleatoria" para empezar.</p>
+  </section>
+
+  <section>
+    <h2 id="lista-titulo">Todas las recetas</h2>
+    <div class="grid-recetas" id="lista"></div>
+  </section>
+
+  <section>
+    <div class="row" style="margin-bottom:6px">
+      <h2 style="margin:0">Calendario de noviembre 2026</h2>
+      <button class="ghost" id="cal-regen" type="button" style="margin-left:auto">Regenerar mes</button>
+    </div>
+    <p class="hint">Cada comida sale de las recetas que encajan en tus macros. Pulsa una comida para ver la receta, o ↻ para cambiarla.</p>
+    <div class="grid-recetas" id="cal" style="margin-top:10px"></div>
+  </section>
+
+  <p class="aviso">Los valores son aproximados (por 100 g de cada ingrediente) y pueden variar según la marca. Esta web es orientativa y no sustituye la pauta de tu nutricionista.</p>
+</main>
+
+<script>
+// Valores por 100 g: [kcal, proteína, carbohidratos, grasa]. Aproximados.
+const ING = {
+  "Avena":[370,13,60,7], "Leche desnatada":[35,3.4,4.9,0.2], "Whey protein":[375,80,7,4],
+  "Pan integral":[245,9,43,3.5], "Huevo":[143,12.6,0.7,9.5], "Clara de huevo":[52,11,0.7,0.2],
+  "Jamón cocido":[110,17,1,4], "Pavo en lonchas":[105,20,1.5,1.5], "Pavo picado":[120,22,0,3.5],
+  "Pollo (pechuga)":[165,31,0,3.6], "Ternera magra":[135,21,0,5.5], "Atún al natural":[110,25,0,1],
+  "Salmón":[200,20,0,13], "Merluza":[85,18,0,1.2], "Gambas":[90,20,0,1],
+  "Queso fresco batido 0%":[50,8.5,3.5,0.2], "Yogur griego 0%":[57,10,3.9,0.2], "Queso light":[180,22,2,9],
+  "Tortilla de trigo":[305,8.5,50,7.5], "Pasta integral (seco)":[350,13,66,2.5], "Arroz blanco (seco)":[355,7,78,0.7],
+  "Cous cous (seco)":[360,13,73,2], "Quinoa (seco)":[368,14,64,6], "Patata":[77,2,17,0.1], "Batata":[86,1.6,20,0.1],
+  "Garbanzos cocidos":[164,9,27,2.6], "Lentejas cocidas":[116,9,20,0.4],
+  "Tomate":[18,0.9,3.9,0.2], "Tomate frito natural":[80,1.5,13,2.5], "Cebolla":[40,1.1,9.3,0.1],
+  "Pimiento rojo":[31,1,6,0.3], "Calabacín":[17,1.2,3.1,0.3], "Brócoli":[34,2.8,6.6,0.4],
+  "Zanahoria":[41,0.9,9.6,0.2], "Espinacas":[23,2.9,3.6,0.4], "Champiñón":[22,3.1,3.3,0.3],
+  "Espárragos":[20,2.2,3.9,0.1], "Pepino":[15,0.7,3.6,0.1], "Lechuga":[15,1.4,2.9,0.2],
+  "Aguacate":[160,2,8.5,14.7], "Fresas":[32,0.7,7.7,0.3], "Arándanos":[57,0.7,14.5,0.3],
+  "Plátano":[89,1.1,23,0.3], "Manzana":[52,0.3,14,0.2], "Nueces":[654,15,14,65], "Almendras":[579,21,22,50],
+  "Mantequilla de cacahuete":[590,25,20,50], "Cacao puro":[228,20,58,14], "Aceite de oliva":[884,0,0,100],
+  "Hummus":[166,8,14,10], "Salsa de soja":[60,6,6,0], "Limón":[29,1.1,9.3,0.3], "Caldo de verduras":[5,0.5,1,0.2]
+};
+
+// n = nombre, c = comida, t = minutos, r = raciones, ing = [ingrediente, gramos totales], p = pasos
+const RECETAS = [
+  {n:"Gachas proteicas de avena", c:"desayuno", t:5, r:1, ing:[["Avena",40],["Leche desnatada",200],["Whey protein",20]],
+   p:["Cuece la avena con la leche 3-4 minutos, removiendo.","Retira del fuego y mezcla el whey con un poco de agua antes de añadirlo.","Sirve con canela o fruta al gusto."], origen:"Del plan del video"},
+  {n:"Tostadas de pan integral con huevo y jamón", c:"desayuno", t:10, r:1, ing:[["Pan integral",50],["Huevo",60],["Jamón cocido",30]],
+   p:["Tuesta el pan.","Cuece el huevo frito con spray o escalfado (2-3 minutos).","Pon el jamón y el huevo sobre el pan."], origen:"Del plan del video"},
+  {n:"Tortitas de avena y plátano", c:"desayuno", t:12, r:1, ing:[["Avena",50],["Plátano",100],["Huevo",60],["Clara de huevo",60],["Arándanos",50]],
+   p:["Tritura la avena, el plátano, el huevo y la clara.","Cuaja porciones pequeñas en sartén antiadherente, 1-2 minutos por lado.","Sirve con arándanos."]},
+  {n:"Tostada de aguacate y huevo", c:"desayuno", t:8, r:1, ing:[["Pan integral",50],["Aguacate",50],["Huevo",60],["Limón",5]],
+   p:["Tuesta el pan.","Machaca el aguacate con limón y sal.","Haz el huevo frito o pasado por agua y monta la tostada."]},
+  {n:"Bowl de queso fresco con frutos rojos", c:"desayuno", t:5, r:1, ing:[["Queso fresco batido 0%",200],["Arándanos",100],["Avena",20],["Almendras",10]],
+   p:["Pon el queso fresco en un bol.","Añade los arándanos, la avena y las almendras troceadas."]},
+  {n:"Batido de proteína con plátano", c:"desayuno", t:3, r:1, ing:[["Whey protein",30],["Leche desnatada",250],["Plátano",100],["Mantequilla de cacahuete",10]],
+   p:["Bate todo con la batidora o la licuadora.","Añade hielo si lo quieres más frío."]},
+  {n:"Porridge de avena con cacao", c:"desayuno", t:8, r:1, ing:[["Avena",50],["Leche desnatada",200],["Cacao puro",8],["Plátano",60]],
+   p:["Cuece la avena con la leche y el cacao unos 4 minutos.","Sirve con el plátano en rodajas."]},
+  {n:"Yogur griego con fresas y nueces", c:"desayuno", t:3, r:1, ing:[["Yogur griego 0%",200],["Fresas",100],["Nueces",15]],
+   p:["Sirve el yogur en un bol.","Añade las fresas troceadas y las nueces."]},
+
+  {n:"Pollo al curry con arroz", c:"comida", t:25, r:2, ing:[["Pollo (pechuga)",300],["Arroz blanco (seco)",120],["Cebolla",100],["Pimiento rojo",160],["Tomate frito natural",200],["Aceite de oliva",10]],
+   p:["Cuece el arroz según el paquete.","Dora el pollo troceado con un poco de aceite y reserva.","Sofríe la cebolla y el pimiento 5 minutos, añade el tomate frito y curry al gusto, y cuece el pollo 10 minutos más.","Sirve con el arroz."]},
+  {n:"Cous cous con pollo y verduras", c:"comida", t:20, r:1, ing:[["Cous cous (seco)",50],["Pollo (pechuga)",120],["Calabacín",100],["Pimiento rojo",80],["Aceite de oliva",10]],
+   p:["Hidrata el cous cous con agua hirviendo según el paquete.","Dora el pollo y saltea el calabacín y el pimiento.","Mezcla todo con el cous cous."], origen:"Del plan del video"},
+  {n:"Pasta integral con wok de verduras y atún", c:"comida", t:20, r:1, ing:[["Pasta integral (seco)",50],["Atún al natural",100],["Brócoli",100],["Zanahoria",50],["Pimiento rojo",50],["Salsa de soja",10],["Aceite de oliva",10]],
+   p:["Cuece la pasta al dente.","Saltea las verduras troceadas con aceite y salsa de soja.","Mezcla con la pasta y el atún escurrido."], origen:"Del plan del video"},
+  {n:"Ensalada de garbanzos y atún", c:"comida", t:10, r:1, ing:[["Garbanzos cocidos",150],["Atún al natural",80],["Tomate",100],["Cebolla",30],["Pepino",100],["Aceite de oliva",10],["Limón",10]],
+   p:["Trocea el tomate, la cebolla y el pepino.","Mezcla con los garbanzos y el atún escurrido.","Aliña con aceite, limón y sal."]},
+  {n:"Salmón al horno con patata y espárragos", c:"comida", t:30, r:1, ing:[["Salmón",150],["Patata",200],["Espárragos",150],["Aceite de oliva",5]],
+   p:["Precalienta el horno a 200 °C.","Hornea la patata en cubos 20 minutos.","Añade el salmón y los espárragos y hornea 12-15 minutos más."]},
+  {n:"Lentejas estofadas con verduras", c:"comida", t:25, r:2, ing:[["Lentejas cocidas",400],["Zanahoria",120],["Cebolla",80],["Tomate",200],["Pimiento rojo",100],["Espinacas",100],["Aceite de oliva",10]],
+   p:["Sofríe la cebolla, la zanahoria y el pimiento 5 minutos.","Añade el tomate troceado y cuece 5 minutos.","Incorpora las lentejas y las espinacas y cuece 10 minutos."]},
+  {n:"Wrap de pollo y verduras", c:"comida", t:10, r:1, ing:[["Tortilla de trigo",60],["Pollo (pechuga)",120],["Lechuga",40],["Tomate",60],["Pepino",40],["Yogur griego 0%",40]],
+   p:["Cocina el pollo a la plancha y trocéalo.","Mezcla el yogur con sal y limón como salsa.","Rellena la tortilla con el pollo y las verduras."]},
+  {n:"Merluza al horno con verduras", c:"comida", t:30, r:1, ing:[["Merluza",180],["Calabacín",150],["Pimiento rojo",100],["Tomate",100],["Patata",150],["Aceite de oliva",5]],
+   p:["Precalienta el horno a 200 °C.","Coloca la patata, el calabacín y el pimiento en una bandeja, y hornea 15 minutos.","Añade la merluza y el tomate y hornea 12 minutos más."]},
+  {n:"Arroz salteado con huevo y verduras", c:"comida", t:20, r:1, ing:[["Arroz blanco (seco)",60],["Huevo",120],["Brócoli",100],["Zanahoria",50],["Cebolla",30],["Salsa de soja",10],["Aceite de oliva",5]],
+   p:["Cuece el arroz y resérvalo.","Saltea la cebolla, la zanahoria y el brócoli.","Aparta las verduras, cuaja los huevos batidos y mezcla todo con el arroz y la salsa de soja."]},
+  {n:"Fajitas de pollo", c:"comida", t:20, r:1, ing:[["Tortilla de trigo",120],["Pollo (pechuga)",150],["Pimiento rojo",100],["Cebolla",50],["Aguacate",40],["Tomate",60],["Aceite de oliva",5]],
+   p:["Saltea el pollo en tiras con el pimiento y la cebolla.","Machaca el aguacate con tomate troceado y sal.","Calienta las tortillas y rellénalas."], origen:"Del plan del video"},
+  {n:"Hamburguesa de pavo en pan integral", c:"comida", t:15, r:1, ing:[["Pavo picado",150],["Pan integral",60],["Tomate",50],["Lechuga",30],["Cebolla",20],["Queso light",20]],
+   p:["Forma una hamburguesa con el pavo y sazona.","Hazla a la plancha 4 minutos por lado; añade el queso al final.","Monta el pan con la carne, tomate, lechuga y cebolla."]},
+  {n:"Pasta boloñesa ligera", c:"comida", t:30, r:1, ing:[["Pasta integral (seco)",70],["Ternera magra",120],["Tomate frito natural",150],["Cebolla",40],["Zanahoria",40],["Aceite de oliva",5]],
+   p:["Dora la carne picada con cebolla y zanahoria rallada.","Añade el tomate frito y cuece 15 minutos a fuego lento.","Sirve sobre la pasta cocida."]},
+  {n:"Ensalada de quinoa con salmón", c:"comida", t:25, r:1, ing:[["Quinoa (seco)",60],["Salmón",120],["Pepino",100],["Tomate",100],["Espinacas",40],["Aceite de oliva",10],["Limón",10]],
+   p:["Cuece la quinoa 12-15 minutos y escúrrela.","Hornea o plancha el salmón y desmenúzalo.","Mezcla con las verduras y aliña con aceite y limón."]},
+  {n:"Pollo con batata al horno", c:"comida", t:35, r:1, ing:[["Pollo (pechuga)",170],["Batata",200],["Brócoli",150],["Aceite de oliva",5]],
+   p:["Precalienta el horno a 200 °C.","Corta la batata en gajos y hornéala 20 minutos.","Añade el pollo y el brócoli y hornea 15 minutos más."]},
+  {n:"Ensalada de atún con huevo", c:"comida", t:10, r:1, ing:[["Atún al natural",100],["Huevo",100],["Lechuga",100],["Tomate",100],["Pan integral",40],["Aceite de oliva",10]],
+   p:["Cuece el huevo 9 minutos y pártelo en cuartos.","Mezcla la lechuga, el tomate y el atún escurrido.","Aliña con aceite y sirve con el pan."]},
+  {n:"Pollo al limón con pepino y yogur", c:"comida", t:25, r:1, ing:[["Pollo (pechuga)",150],["Yogur griego 0%",100],["Pepino",150],["Arroz blanco (seco)",60],["Limón",10]],
+   p:["Cuece el arroz según el paquete.","Cocina el pollo a la plancha con limón y sal.","Sirve con pepino en rodajas y una salsa de yogur y limón."]},
+  {n:"Pizza fit en tortilla de trigo", c:"comida", t:12, r:1, ing:[["Tortilla de trigo",60],["Tomate frito natural",60],["Queso light",40],["Jamón cocido",40],["Champiñón",50],["Espinacas",30]],
+   p:["Extiende el tomate frito sobre la tortilla.","Añade el queso, el jamón, el champiñón y las espinacas.","Hornea a 200 °C unos 8 minutos hasta que el queso esté fundido."]},
+
+  {n:"Tortilla de claras con champiñón y espinacas", c:"cena", t:10, r:1, ing:[["Clara de huevo",150],["Huevo",60],["Champiñón",100],["Espinacas",50],["Pan integral",40],["Aceite de oliva",3]],
+   p:["Saltea el champiñón y las espinacas.","Bate las claras con el huevo, vierte sobre las verduras y cuaja.","Sirve con el pan tostado."]},
+  {n:"Crema de calabacín con pavo", c:"cena", t:25, r:2, ing:[["Calabacín",600],["Cebolla",80],["Patata",200],["Queso fresco batido 0%",100],["Aceite de oliva",10],["Caldo de verduras",600],["Pavo en lonchas",120]],
+   p:["Sofríe la cebolla con aceite.","Añade el calabacín, la patata y el caldo, y cuece 15 minutos.","Tritura con el queso fresco y sirve con el pavo a la plancha troceado encima."]},
+  {n:"Revuelto de gambas y champiñones", c:"cena", t:12, r:1, ing:[["Huevo",100],["Gambas",100],["Champiñón",100],["Pan integral",50],["Aceite de oliva",5]],
+   p:["Saltea el champiñón y las gambas 4 minutos.","Añade los huevos batidos y remueve hasta cuajar.","Sirve con el pan tostado."]},
+  {n:"Sopa de pollo con verduras", c:"cena", t:30, r:2, ing:[["Caldo de verduras",1000],["Pollo (pechuga)",200],["Zanahoria",120],["Calabacín",200],["Cebolla",60],["Patata",160],["Aceite de oliva",6]],
+   p:["Sofríe la cebolla con aceite unos minutos.","Añade el caldo, la patata, la zanahoria y el calabacín, y cuece 15 minutos.","Incorpora el pollo troceado y cuece 5 minutos más."]},
+  {n:"Hummus con pavo y verduras", c:"cena", t:5, r:1, ing:[["Hummus",60],["Pavo en lonchas",100],["Pepino",100],["Zanahoria",80],["Pan integral",40]],
+   p:["Corta las verduras en bastones.","Sirve el hummus con el pavo enrollado y las verduras.","Acompaña con el pan."]},
+  {n:"Calabacín relleno de pavo y queso", c:"cena", t:35, r:2, ing:[["Calabacín",300],["Pavo picado",300],["Tomate frito natural",120],["Queso light",80],["Cebolla",60],["Aceite de oliva",10]],
+   p:["Precalienta el horno a 200 °C.","Vacía los calabacines por la mitad y sofríe la pulpa con la cebolla y el pavo.","Rellena, cubre con tomate y queso, y hornea 20 minutos."]},
+
+  {n:"Queso fresco con fruta y nueces", c:"snack", t:3, r:1, ing:[["Queso fresco batido 0%",200],["Fresas",100],["Nueces",15]],
+   p:["Pon el queso fresco en un bol.","Añade las fresas y las nueces troceadas."], origen:"Del plan del video"},
+  {n:"Tostada de pan integral con hummus y pavo", c:"snack", t:4, r:1, ing:[["Pan integral",40],["Hummus",40],["Pavo en lonchas",40]],
+   p:["Tuesta el pan.","Unta el hummus y cubre con el pavo."]},
+  {n:"Manzana con mantequilla de cacahuete", c:"snack", t:2, r:1, ing:[["Manzana",150],["Mantequilla de cacahuete",15]],
+   p:["Corta la manzana en gajos.","Sírvela con la mantequilla de cacahuete para mojar."]},
+  {n:"Tostada de pan con atún y tomate", c:"snack", t:5, r:1, ing:[["Pan integral",40],["Atún al natural",50],["Tomate",50]],
+   p:["Tuesta el pan.","Mezcla el atún escurrido con tomate troceado y sal.","Sirve sobre el pan."]},
+  {n:"Bolitas de avena, cacahuete y cacao", c:"snack", t:15, r:4, ing:[["Avena",160],["Mantequilla de cacahuete",80],["Whey protein",60],["Cacao puro",20],["Plátano",200]],
+   p:["Aplasta el plátano y mézclalo con el resto de ingredientes.","Forma bolitas de unos 30 g.","Refrigéralas 30 minutos antes de comerlas."]},
+  {n:"Yogur griego con arándanos y almendras", c:"snack", t:2, r:1, ing:[["Yogur griego 0%",200],["Arándanos",100],["Almendras",10]],
+   p:["Sirve el yogur en un bol.","Añade los arándanos y las almendras troceadas."]},
+  {n:"Palitos de zanahoria con hummus", c:"snack", t:3, r:1, ing:[["Zanahoria",150],["Hummus",60]],
+   p:["Corta la zanahoria en bastones.","Sírvela con el hummus."]},
+  {n:"Helado proteico de plátano", c:"snack", t:10, r:1, ing:[["Yogur griego 0%",150],["Plátano",100],["Cacao puro",5],["Whey protein",15]],
+   p:["Tritura todos los ingredientes hasta que quede cremoso.","Congela 3 horas removiendo a mitad, o sirve enseguida como batido espeso."]},
+
+  {n:"Huevos revueltos con espinacas y tostada", c:"desayuno", t:8, r:1, ing:[["Huevo",120],["Espinacas",80],["Pan integral",50],["Aceite de oliva",3]],
+   p:["Saltea las espinacas 1 minuto con un poco de aceite.","Bate los huevos, añádelos y remueve a fuego suave hasta que cuajen.","Sirve con la tostada de pan integral."]},
+  {n:"Overnight oats con yogur y fresas", c:"desayuno", t:5, r:1, ing:[["Avena",50],["Yogur griego 0%",150],["Leche desnatada",100],["Fresas",100],["Almendras",10]],
+   p:["Mezcla la avena con la leche y el yogur en un bote.","Tapa y refrigera de un día para otro (mínimo 4 horas).","Por la mañana añade las fresas troceadas y las almendras."]},
+  {n:"Batido verde de plátano y manzana", c:"snack", t:3, r:1, ing:[["Espinacas",60],["Plátano",100],["Manzana",100],["Leche desnatada",200],["Whey protein",15]],
+   p:["Pon todos los ingredientes en la licuadora.","Tritura hasta que quede liso y sirve frío."]},
+  {n:"Mousse de yogur y cacao", c:"snack", t:5, r:1, ing:[["Yogur griego 0%",150],["Cacao puro",8],["Plátano",60],["Whey protein",15],["Fresas",50]],
+   p:["Tritura el yogur, el plátano, el cacao y el whey hasta obtener una crema.","Sirve en un vaso y decora con fresas.","Refrigera 20 minutos si la quieres más firme."]},
+
+  {n:"Pollo a la plancha con brócoli y arroz", c:"comida", t:20, r:1, ing:[["Pollo (pechuga)",150],["Arroz blanco (seco)",60],["Brócoli",150],["Aceite de oliva",5],["Limón",5]],
+   p:["Cuece el arroz según el paquete.","Cocina el brócoli al vapor 5-6 minutos.","Plancha el pollo con limón y sal, y sirve con el arroz y el brócoli."]},
+  {n:"Tacos de ternera con pimiento y tomate", c:"comida", t:20, r:1, ing:[["Tortilla de trigo",80],["Ternera magra",130],["Cebolla",40],["Pimiento rojo",80],["Tomate",60],["Lechuga",30]],
+   p:["Dora la ternera picada con la cebolla y el pimiento en tiras.","Pica el tomate y la lechuga.","Calienta las tortillas, rellénalas y añade el tomate y la lechuga."]},
+  {n:"Ensalada César ligera con pollo", c:"comida", t:15, r:1, ing:[["Lechuga",150],["Pollo (pechuga)",120],["Queso light",30],["Pan integral",40],["Yogur griego 0%",60],["Limón",5]],
+   p:["Cocina el pollo a la plancha y trocéalo.","Tuesta el pan en cubos para hacer crutones.","Mezcla el yogur con limón y sal como aderezo, y monta la ensalada con el resto."]},
+  {n:"Wok de ternera con brócoli y arroz", c:"comida", t:20, r:1, ing:[["Ternera magra",150],["Brócoli",150],["Pimiento rojo",80],["Arroz blanco (seco)",70],["Salsa de soja",15],["Aceite de oliva",5]],
+   p:["Cuece el arroz.","Saltea la ternera en tiras a fuego fuerte y resérvala.","Saltea el brócoli y el pimiento, añade la ternera y la salsa de soja, y sirve con el arroz."]},
+  {n:"Brochetas de pollo y verduras al horno", c:"comida", t:25, r:2, ing:[["Pollo (pechuga)",300],["Pimiento rojo",160],["Cebolla",100],["Calabacín",160],["Aceite de oliva",10],["Limón",10]],
+   p:["Precalienta el horno a 200 °C.","Trocea el pollo y las verduras, y ensártalos en brochetas.","Pincela con aceite y limón, y hornea 20 minutos dándoles la vuelta a mitad."]},
+  {n:"Gambas con espárragos y arroz", c:"comida", t:20, r:1, ing:[["Gambas",150],["Espárragos",150],["Arroz blanco (seco)",60],["Aceite de oliva",8],["Salsa de soja",10]],
+   p:["Cuece el arroz según el paquete.","Saltea los espárragos 5 minutos con aceite.","Añade las gambas y la salsa de soja 3 minutos más y sirve con el arroz."]},
+
+  {n:"Tortilla de patata ligera", c:"cena", t:25, r:2, ing:[["Patata",200],["Huevo",100],["Clara de huevo",60],["Cebolla",40],["Aceite de oliva",5]],
+   p:["Corta la patata y la cebolla en láminas finas y cuécelas a fuego suave con el aceite.","Bate los huevos con las claras, mezcla con la patata escurrida y sal.","Cuaja en sartén antiadherente por ambos lados."]},
+  {n:"Gazpacho con pavo", c:"cena", t:15, r:2, ing:[["Tomate",500],["Pepino",100],["Pimiento rojo",80],["Cebolla",30],["Aceite de oliva",10],["Pan integral",30],["Pavo en lonchas",60]],
+   p:["Trocea las verduras y el pan remojado.","Tritura todo con aceite y sal hasta que quede fino.","Sirve frío con el pavo en tiras por encima."]},
+  {n:"Bocadillo de pavo y queso light", c:"cena", t:5, r:1, ing:[["Pan integral",80],["Pavo en lonchas",80],["Queso light",20],["Tomate",50],["Lechuga",20]],
+   p:["Tuesta ligeramente el pan.","Coloca el pavo, el queso, el tomate y la lechuga.","Cierra y sirve."]},
+  {n:"Garbanzos salteados con espinacas y huevo", c:"cena", t:15, r:1, ing:[["Garbanzos cocidos",200],["Espinacas",100],["Huevo",100],["Cebolla",30],["Tomate",80],["Aceite de oliva",5]],
+   p:["Sofríe la cebolla y el tomate troceado 5 minutos.","Añade los garbanzos escurridos y las espinacas, y cuece 3 minutos.","Haz un hueco, cascas el huevo dentro y tapa hasta que cuaje."]}
+];
+
+const KEY = "macros-recetas";
+const DEF = {kcal:1400, p:115, c:120, g:50};
+const REPARTO = {desayuno:.25, comida:.35, snack:.10, cena:.30};
+const NOMBRE = {desayuno:"Desayuno", comida:"Comida", snack:"Snack", cena:"Cena"};
+const UMBRAL = 0.25; // error medio máximo para considerar que una receta "encaja"
+const PESOS = [2, 1, 1, 0.5]; // kcal, proteína, carbos, grasa
+
+let obj = cargarObjetivo();
+let filtros = {comida:"todas", tiempo:"0", soloEncaja:true};
+let ultima = null;
+
+function cargarObjetivo(){
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s && s.kcal) return s;
+  } catch (e) {}
+  return {...DEF};
+}
+function guardarObjetivo(){
+  try { localStorage.setItem(KEY, JSON.stringify(obj)); } catch (e) {}
+}
+
+// Macros por ración con las cantidades de la receta, sin escalar
+function porRacion(r){
+  const t = [0,0,0,0];
+  for (const [nombre, g] of r.ing){
+    const v = ING[nombre];
+    if (!v) { console.warn("Falta ingrediente:", nombre); continue; }
+    for (let i = 0; i < 4; i++) t[i] += v[i] * g / 100;
+  }
+  return t.map(x => x / r.r);
+}
+
+function objetivoComida(comida){
+  const s = REPARTO[comida];
+  return [obj.kcal*s, obj.p*s, obj.c*s, obj.g*s];
+}
+
+// Busca la porción (0.5x a 1.5x) que mejor encaja con el objetivo de su comida
+function evalua(r){
+  const base = porRacion(r);
+  const t = objetivoComida(r.c);
+  let mejor = null;
+  for (let m = 0.5; m <= 1.5001; m += 0.05){
+    const mm = Math.round(m*100)/100;
+    let suma = 0;
+    for (let i = 0; i < 4; i++) suma += PESOS[i] * Math.abs(base[i]*mm - t[i]) / t[i];
+    const err = suma / PESOS.reduce((a,b)=>a+b,0);
+    if (!mejor || err < mejor.err) mejor = {m:mm, err};
+  }
+  return {...mejor, valores: base.map(x => x*mejor.m)};
+}
+
+function candidatas(){
+  return RECETAS
+    .filter(r => (filtros.comida === "todas" || r.c === filtros.comida) &&
+                 (filtros.tiempo === "0" || r.t <= +filtros.tiempo))
+    .map(r => ({r, ev: evalua(r)}));
+}
+
+function elegirAleatoria(){
+  const c = candidatas();
+  if (!c.length) return null;
+  let pool = c;
+  if (filtros.soloEncaja){
+    const buenas = c.filter(x => x.ev.err <= UMBRAL);
+    pool = buenas.length ? buenas : c.slice().sort((a,b)=>a.ev.err-b.ev.err).slice(0,5);
+  }
+  const sinRepetir = pool.filter(x => !ultima || x.r.n !== ultima.n);
+  const lista = sinRepetir.length ? sinRepetir : pool;
+  return lista[Math.floor(Math.random()*lista.length)];
+}
+
+function ajuste(err){ return Math.max(0, Math.round((1-err)*100)); }
+
+function macrosHTML(v){
+  return `<div class="macros">
+    <span>${Math.round(v[0])} kcal</span>
+    <span>P ${Math.round(v[1])} g</span>
+    <span>C ${Math.round(v[2])} g</span>
+    <span>G ${Math.round(v[3])} g</span>
+  </div>`;
+}
+
+function pintaDetalle(item){
+  const {r, ev} = item;
+  ultima = r;
+  const pct = ajuste(ev.err);
+  const encaja = ev.err <= UMBRAL;
+  const ings = r.ing.map(([n,g]) => `<li>${Math.round(g*ev.m)} g ${n}</li>`).join("");
+  const pasos = r.p.map(p => `<li>${p}</li>`).join("");
+  document.getElementById("detalle").innerHTML = `
+    <div class="detalle-cab">
+      <div>
+        <span class="pill">${NOMBRE[r.c]}</span>
+        <h2 style="font-size:1.4rem;margin:8px 0 4px">${r.n}</h2>
+        <div class="meta">${r.t} min · ${r.r} ración(es)${r.origen ? " · " + r.origen : ""}</div>
+      </div>
+      <span class="pill ${encaja ? "" : "warn"}">${encaja ? "Encaja" : "Aproximada"} · ${pct}%</span>
+    </div>
+    <div class="bar"><div style="width:${pct}%"></div></div>
+    <p class="meta" style="margin-top:12px">Porción recomendada: <strong>${ev.m.toFixed(2)}×</strong> la receta. Macros por porción:</p>
+    ${macrosHTML(ev.valores)}
+    <div class="row" style="align-items:flex-start;gap:24px">
+      <div style="flex:1;min-width:200px"><h2>Ingredientes</h2><ul>${ings}</ul></div>
+      <div style="flex:1;min-width:200px"><h2>Preparación</h2><ol>${pasos}</ol></div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button class="ghost" type="button" onclick="pintaDetalle(elegirAleatoria() || {r:ultima, ev:evalua(ultima)})">Otra receta</button>
+    </div>`;
+  document.getElementById("detalle").scrollIntoView({behavior:"smooth", block:"start"});
+}
+
+function pintaLista(){
+  const c = candidatas();
+  const titulo = document.getElementById("lista-titulo");
+  titulo.textContent = `Recetas (${c.length})`;
+  const cont = document.getElementById("lista");
+  if (!c.length){ cont.innerHTML = `<p class="vacio">No hay recetas con estos filtros.</p>`; return; }
+  cont.innerHTML = c.map((x, i) => {
+    const pct = ajuste(x.ev.err);
+    const encaja = x.ev.err <= UMBRAL;
+    return `<button type="button" class="card card-receta" data-i="${i}" style="margin:0;background:var(--card);color:var(--ink);font-weight:400">
+      <span class="pill">${NOMBRE[x.r.c]}</span>
+      <span class="pill ${encaja ? "" : "warn"}" style="float:right">${pct}%</span>
+      <h3>${x.r.n}</h3>
+      <div class="meta">${x.r.t} min · ${x.ev.m.toFixed(2)}× porción</div>
+      ${macrosHTML(x.ev.valores)}
+    </button>`;
+  }).join("");
+  cont.querySelectorAll("[data-i]").forEach(el => {
+    el.addEventListener("click", () => pintaDetalle(c[+el.dataset.i]));
+  });
+}
+
+function pintaObjetivo(){
+  document.getElementById("o-kcal").value = obj.kcal;
+  document.getElementById("o-p").value = obj.p;
+  document.getElementById("o-c").value = obj.c;
+  document.getElementById("o-g").value = obj.g;
+  const kcalMacros = obj.p*4 + obj.c*4 + obj.g*9;
+  document.getElementById("o-check").textContent =
+    `Los macros suman ${Math.round(kcalMacros)} kcal (objetivo ${obj.kcal}).`;
+  pintaCalendario();
+}
+
+function leerObjetivo(){
+  const v = id => +document.getElementById(id).value || 0;
+  obj = {kcal: v("o-kcal"), p: v("o-p"), c: v("o-c"), g: v("o-g")};
+  guardarObjetivo();
+  pintaObjetivo();
+  pintaLista();
+}
+
+["o-kcal","o-p","o-c","o-g"].forEach(id =>
+  document.getElementById(id).addEventListener("change", leerObjetivo));
+
+document.getElementById("o-reset").addEventListener("click", () => {
+  obj = {...DEF};
+  guardarObjetivo();
+  pintaObjetivo();
+  pintaLista();
+});
+
+document.getElementById("f-comida").addEventListener("change", e => { filtros.comida = e.target.value; pintaLista(); });
+document.getElementById("f-tiempo").addEventListener("change", e => { filtros.tiempo = e.target.value; pintaLista(); });
+document.getElementById("f-encaja").addEventListener("change", e => { filtros.soloEncaja = e.target.checked; pintaLista(); });
+
+document.getElementById("btn-dado").addEventListener("click", () => {
+  const item = elegirAleatoria();
+  if (!item){
+    document.getElementById("detalle").innerHTML = `<p class="vacio">No hay recetas con estos filtros. Prueba a quitar el límite de tiempo.</p>`;
+    return;
+  }
+  pintaDetalle(item);
+});
+
+// Calendario de noviembre 2026: una receta por comida y día
+const CAL_KEY = "macros-calendario";
+const DIAS_MES = 30;
+const DIAS_SEM = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const COMIDAS = ["desayuno","comida","snack","cena"];
+
+function eligeReceta(c, usados){
+  const todas = RECETAS.filter(r => r.c === c).map(r => ({r, ev: evalua(r)}));
+  let pool = todas.filter(x => x.ev.err <= UMBRAL && !usados.has(x.r.n));
+  if (!pool.length) pool = todas.filter(x => x.ev.err <= UMBRAL);
+  if (!pool.length) pool = todas.slice().sort((a,b) => a.ev.err - b.ev.err).slice(0,5);
+  const elegida = pool[Math.floor(Math.random()*pool.length)];
+  usados.add(elegida.r.n);
+  return elegida.r.n;
+}
+
+function generaCalendario(){
+  const usados = new Set();
+  const dias = [];
+  for (let d = 1; d <= DIAS_MES; d++){
+    const comidas = {};
+    for (const c of COMIDAS) comidas[c] = eligeReceta(c, usados);
+    dias.push({d, comidas});
+  }
+  return dias;
+}
+
+function guardarCalendario(p){
+  try { localStorage.setItem(CAL_KEY, JSON.stringify(p)); } catch (e) {}
+}
+
+function cargarCalendario(){
+  try {
+    const s = JSON.parse(localStorage.getItem(CAL_KEY));
+    const valido = Array.isArray(s) && s.length === DIAS_MES &&
+      s.every(d => COMIDAS.every(c => RECETAS.some(r => r.n === d.comidas[c])));
+    if (valido) return s;
+  } catch (e) {}
+  const nuevo = generaCalendario();
+  guardarCalendario(nuevo);
+  return nuevo;
+}
+
+function cambiaComida(i, c){
+  const usados = new Set(Object.values(plan[i].comidas));
+  plan[i].comidas[c] = eligeReceta(c, usados);
+  guardarCalendario(plan);
+  pintaCalendario();
+}
+
+function pintaCalendario(){
+  const cont = document.getElementById("cal");
+  cont.innerHTML = plan.map((dia, i) => {
+    const fecha = new Date(2026, 10, dia.d);
+    const tot = [0,0,0,0];
+    const filas = COMIDAS.map(c => {
+      const r = RECETAS.find(x => x.n === dia.comidas[c]);
+      evalua(r).valores.forEach((v,k) => tot[k] += v);
+      return `<div class="fila">
+        <span class="fila-c">${NOMBRE[c]}</span>
+        <span class="fila-n" data-ver="${i}|${c}">${r.n}</span>
+        <button type="button" class="mini" data-cambia="${i}|${c}" title="Cambiar esta comida">↻</button>
+      </div>`;
+    }).join("");
+    const pct = Math.round(tot[0] / (obj.kcal || 1) * 100);
+    return `<div class="card" style="margin:0">
+      <div class="row" style="justify-content:space-between">
+        <strong>${DIAS_SEM[fecha.getDay()]} ${dia.d}</strong>
+        <span class="pill ${Math.abs(pct-100) <= 15 ? "" : "warn"}">${pct}% de kcal</span>
+      </div>
+      ${macrosHTML(tot)}
+      ${filas}
+    </div>`;
+  }).join("");
+  cont.querySelectorAll("[data-ver]").forEach(el => el.addEventListener("click", () => {
+    const [i, c] = el.dataset.ver.split("|");
+    const r = RECETAS.find(x => x.n === plan[+i].comidas[c]);
+    pintaDetalle({r, ev: evalua(r)});
+  }));
+  cont.querySelectorAll("[data-cambia]").forEach(el => el.addEventListener("click", () => {
+    const [i, c] = el.dataset.cambia.split("|");
+    cambiaComida(+i, c);
+  }));
+}
+
+let plan = cargarCalendario();
+document.getElementById("cal-regen").addEventListener("click", () => {
+  plan = generaCalendario();
+  guardarCalendario(plan);
+  pintaCalendario();
+});
+
+pintaObjetivo();
+pintaLista();
+</script>
+</body>
+</html>

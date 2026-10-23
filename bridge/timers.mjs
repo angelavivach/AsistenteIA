@@ -175,3 +175,8 @@ export function timersServer() {
     ],
   })
 }
+
+/** For the Kindle panel: pending timers and alarms, soonest first. */
+export function pendingTimers() {
+  return [...timers.values()].sort((a, b) => a.at - b.at).map(describe)
+}

@@ -31,3 +31,6 @@ public/mediapipe/
 
 # Panel generado con tus aparatos (npm run panel:casa)
 pantalla/panel-casa.yaml
+
+# Archivo con la clave del panel, generado en cada equipo
+kindle/config.sh

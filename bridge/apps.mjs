@@ -313,3 +313,28 @@ export function appsServer() {
     ],
   })
 }
+
+/** For the Kindle panel: the lines of one note (e.g. "Lista de la compra"), or []. Never throws. */
+export async function noteLines(title) {
+  try {
+    if (process.platform === 'darwin') {
+      const out = await run('osascript', ['-', title], `${NOTES_LIB}
+on run argv
+  set f to my ensureFolder()
+  tell application "Notes"
+    set hits to (notes of f whose name is (item 1 of argv))
+    if (count of hits) is 0 then return ""
+    return plaintext of (item 1 of hits)
+  end tell
+end run`)
+      return out.split('\n').map((l) => l.trim()).filter((l) => l && l !== title)
+    }
+    const text = await readFile(join(notesDir(), `${safeName(title)}.md`), 'utf8')
+    return text
+      .split('\n')
+      .map((l) => l.replace(/^[-#*]\s*/, '').replace(/\s*_\(.*\)_\s*$/, '').trim())
+      .filter((l) => l && l !== title && !/^_.*_$/.test(l))
+  } catch {
+    return []
+  }
+}

@@ -26,6 +26,7 @@ import { handleHome, homeConfigured } from './home.mjs'
 import { handleSpotify, spotifyConfigured, spotifyServer } from './spotify.mjs'
 import { appsServer, setPreferredBrowser } from './apps.mjs'
 import { startTimers, timersServer } from './timers.mjs'
+import { handleKindle, kindleUrls } from './kindle.mjs'
 import { homedir, tmpdir } from 'node:os'
 import { readFileSync, realpathSync } from 'node:fs'
 import { readFile, realpath, stat } from 'node:fs/promises'
@@ -787,6 +788,8 @@ const handleRequest = async (req, res) => {
   if (await handleHome(req, res, cors)) return
   // Spotify sign-in (login + callback pages).
   if (await handleSpotify(req, res)) return
+  // The e-ink panel for the Kindle.
+  if (await handleKindle(req, res)) return
 
   if (req.method === 'GET' && req.url === '/health') {
     // The browser reads this once at boot to decide which voice engine to use.
@@ -1115,6 +1118,7 @@ const wss = new WebSocketServer({
   },
 })
 server.listen(PORT)
+for (const url of await kindleUrls(PORT)) console.log(`[odin] panel del Kindle: ${url}`)
 
 console.log(`[jarvis] bridge listening on ws://localhost:${PORT}`)
 console.log(

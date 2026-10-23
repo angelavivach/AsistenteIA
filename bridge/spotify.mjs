@@ -499,3 +499,15 @@ export function spotifyServer() {
     ],
   })
 }
+
+/** For the Kindle panel: what is playing, or null. Never throws. */
+export async function nowPlaying() {
+  try {
+    if (!spotifyConfigured() || !(await loadTokens())) return null
+    const s = await api('/me/player')
+    if (!s?.item || !s.is_playing) return null
+    return { title: s.item.name, by: s.item.artists?.map((a) => a.name).join(', ') ?? '' }
+  } catch {
+    return null
+  }
+}
